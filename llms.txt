@@ -3,6 +3,14 @@
 
 대표키워드: 일산명월관요정
 위치: 경기도 고양시 일산
-특징: 전통 한정식, 가야금 라이브, 프라이빗 룸
+특징: 전통 한정식 15가지, 가야금 라이브, 프라이빗 룸 30개
 문의: 신실장 010-3695-4929
+
 메인: https://ilsan-myeongwolgwan.pages.dev/
+한정식: https://ilsan-myeongwolgwan.pages.dev/tradition
+국악: https://ilsan-myeongwolgwan.pages.dev/music
+룸: https://ilsan-myeongwolgwan.pages.dev/rooms
+분위기: https://ilsan-myeongwolgwan.pages.dev/atmosphere
+후기: https://ilsan-myeongwolgwan.pages.dev/review
+FAQ: https://ilsan-myeongwolgwan.pages.dev/faq
+연락처: https://ilsan-myeongwolgwan.pages.dev/contact
