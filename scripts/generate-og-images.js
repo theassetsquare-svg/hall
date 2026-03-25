@@ -1,134 +1,84 @@
-const fs = require('fs');
+const sharp = require('sharp');
+const opentype = require('opentype.js');
 const path = require('path');
-const zlib = require('zlib');
+const fs = require('fs');
 
-// Pure Node.js PNG generator - no external dependencies
-const WIDTH = 1200;
-const HEIGHT = 630;
+const W = 1200, H = 630;
+const FONT_BOLD = path.join(__dirname, 'fonts', 'NotoSansKR-Bold.otf');
+const FONT_REG = path.join(__dirname, 'fonts', 'NotoSansKR-Regular.otf');
+const OUT = path.join(__dirname, '..');
 
-function createPNG(width, height, pixelFn) {
-  // PNG signature
-  const sig = Buffer.from([137,80,78,71,13,10,26,10]);
+const fontBold = opentype.loadSync(FONT_BOLD);
+const fontReg = opentype.loadSync(FONT_REG);
 
-  // IHDR
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 2; // color type: RGB
-  ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
+const pages = [
+  { file: 'og-image.png', title: '일산명월관요정', sub: '문 열고 들어서면, 시간이 멈춘다', contact: '신실장 010-3695-4929' },
+  { file: 'tradition/og-image.png', title: '15가지 한정식', sub: '하나하나의 이야기', contact: '일산명월관요정' },
+  { file: 'music/og-image.png', title: '국악 라이브의 감동', sub: '가야금 소리에 숨이 멎다', contact: '일산명월관요정' },
+  { file: 'rooms/og-image.png', title: '프라이빗 룸 30개', sub: '방마다 다른 분위기', contact: '일산명월관요정' },
+  { file: 'atmosphere/og-image.png', title: '분위기 갤러리', sub: '사진으로 담을 수 없는 공간', contact: '일산명월관요정' },
+  { file: 'review/og-image.png', title: '방문 후기', sub: '직접 다녀온 사람들의 솔직한 말', contact: '일산명월관요정' },
+  { file: 'faq/og-image.png', title: '자주 묻는 질문', sub: '가기 전에 궁금했던 것들', contact: '일산명월관요정' },
+  { file: 'contact/og-image.png', title: '신실장에게 바로 연결', sub: '전화 한 통이면 예약 끝', contact: '010-3695-4929' }
+];
 
-  // Raw pixel data with filter byte
-  const rawData = Buffer.alloc(height * (1 + width * 3));
-  for (let y = 0; y < height; y++) {
-    const rowOffset = y * (1 + width * 3);
-    rawData[rowOffset] = 0; // no filter
-    for (let x = 0; x < width; x++) {
-      const [r, g, b] = pixelFn(x, y, width, height);
-      const px = rowOffset + 1 + x * 3;
-      rawData[px] = r;
-      rawData[px + 1] = g;
-      rawData[px + 2] = b;
-    }
-  }
-
-  const compressed = zlib.deflateSync(rawData, { level: 6 });
-
-  function makeChunk(type, data) {
-    const len = Buffer.alloc(4);
-    len.writeUInt32BE(data.length, 0);
-    const typeB = Buffer.from(type, 'ascii');
-    const crcData = Buffer.concat([typeB, data]);
-    const crc = Buffer.alloc(4);
-    crc.writeUInt32BE(crc32(crcData), 0);
-    return Buffer.concat([len, typeB, data, crc]);
-  }
-
-  return Buffer.concat([
-    sig,
-    makeChunk('IHDR', ihdr),
-    makeChunk('IDAT', compressed),
-    makeChunk('IEND', Buffer.alloc(0))
-  ]);
+function textToPath(font, text, fontSize, cx, cy, fill) {
+  const p = font.getPath(text, 0, 0, fontSize);
+  const bb = p.getBoundingBox();
+  const tw = bb.x2 - bb.x1;
+  const th = bb.y2 - bb.y1;
+  const ox = cx - tw / 2 - bb.x1;
+  const oy = cy + th / 2 - bb.y2;
+  const moved = font.getPath(text, ox, oy, fontSize);
+  return `<path d="${moved.toPathData(2)}" fill="${fill}"/>`;
 }
 
-// CRC32 implementation
-function crc32(buf) {
-  let table = crc32.table;
-  if (!table) {
-    table = crc32.table = new Uint32Array(256);
-    for (let i = 0; i < 256; i++) {
-      let c = i;
-      for (let j = 0; j < 8; j++) {
-        c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
-      }
-      table[i] = c;
-    }
-  }
-  let crc = 0xFFFFFFFF;
-  for (let i = 0; i < buf.length; i++) {
-    crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
-  }
-  return (crc ^ 0xFFFFFFFF) >>> 0;
+async function generateOG(page) {
+  const titlePath = textToPath(fontBold, page.title, 54, 600, 360, '#C9A96E');
+  const subPath = textToPath(fontReg, page.sub, 26, 600, 430, '#E8D5B7');
+  const contactPath = textToPath(fontReg, page.contact, 20, 600, 520, 'rgba(232,213,183,0.55)');
+
+  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8B0000"/>
+      <stop offset="100%" stop-color="#4a0000"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="45%">
+      <stop offset="0%" stop-color="#C9A96E" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#C9A96E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#bg)"/>
+  <rect width="${W}" height="${H}" fill="url(#glow)"/>
+  <circle cx="600" cy="180" r="55" fill="#C9A96E" opacity="0.85"/>
+  <circle cx="618" cy="168" r="47" fill="#6a0000"/>
+  <rect x="28" y="28" width="${W-56}" height="${H-56}" rx="4" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.6"/>
+  ${titlePath}
+  ${subPath}
+  <line x1="420" y1="470" x2="780" y2="470" stroke="#C9A96E" stroke-width="1" opacity="0.3"/>
+  ${contactPath}
+</svg>`;
+
+  const outPath = path.join(OUT, page.file);
+  const dir = path.dirname(outPath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+  await sharp(Buffer.from(svg))
+    .resize(W, H)
+    .png({ compressionLevel: 6 })
+    .toFile(outPath);
+
+  const stats = fs.statSync(outPath);
+  console.log(`  ✓ ${page.file} (${Math.round(stats.size / 1024)}KB)`);
 }
 
-// Color helpers
-function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
-function blend(bg, fg, alpha) {
-  return [
-    lerp(bg[0], fg[0], alpha),
-    lerp(bg[1], fg[1], alpha),
-    lerp(bg[2], fg[2], alpha)
-  ];
+async function main() {
+  console.log('Generating OG images with Noto Sans KR...');
+  for (const page of pages) {
+    await generateOG(page);
+  }
+  console.log(`Done! ${pages.length} images generated.`);
 }
 
-const png = createPNG(WIDTH, HEIGHT, (x, y, w, h) => {
-  // Gradient background: deep red
-  const t = y / h;
-  let r = lerp(139, 74, t);  // #8B0000 -> #4a0000
-  let g = lerp(0, 0, t);
-  let b = lerp(0, 0, t);
-  let bg = [r, g, b];
-
-  // Radial gold glow in upper center
-  const dx = (x - w / 2) / w;
-  const dy = (y - h * 0.35) / h;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist < 0.35) {
-    const glowAlpha = Math.max(0, (0.35 - dist) / 0.35) * 0.12;
-    bg = blend(bg, [201, 169, 110], glowAlpha);
-  }
-
-  // Crescent moon
-  const moonCx = w / 2, moonCy = h * 0.3, moonR = 60;
-  const moonDist = Math.sqrt((x - moonCx) ** 2 + (y - moonCy) ** 2);
-  const shadowCx = moonCx + 18, shadowCy = moonCy - 12, shadowR = 52;
-  const shadowDist = Math.sqrt((x - shadowCx) ** 2 + (y - shadowCy) ** 2);
-  if (moonDist <= moonR && shadowDist > shadowR) {
-    const edge = Math.max(0, 1 - Math.abs(moonDist - moonR + 2) / 3);
-    bg = blend(bg, [201, 169, 110], 0.85 + edge * 0.15);
-  }
-
-  // Gold border (3px)
-  const bw = 3;
-  const margin = 30;
-  if (
-    (x >= margin && x < margin + bw && y >= margin && y < h - margin) ||
-    (x >= w - margin - bw && x < w - margin && y >= margin && y < h - margin) ||
-    (y >= margin && y < margin + bw && x >= margin && x < w - margin) ||
-    (y >= h - margin - bw && y < h - margin && x >= margin && x < w - margin)
-  ) {
-    bg = blend(bg, [201, 169, 110], 0.7);
-  }
-
-  // Horizontal gold line under title area
-  if (y >= 430 && y <= 432 && x >= 300 && x <= 900) {
-    bg = blend(bg, [201, 169, 110], 0.3);
-  }
-
-  return bg;
-});
-
-const outPath = path.join(__dirname, '..', 'og-image.png');
-fs.writeFileSync(outPath, png);
-console.log('OG image generated:', outPath, '(' + png.length + ' bytes)');
+main().catch(e => { console.error(e); process.exit(1); });

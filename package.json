@@ -3,5 +3,9 @@
   "private": true,
   "scripts": {
     "generate-og": "node scripts/generate-og-images.js"
+  },
+  "dependencies": {
+    "opentype.js": "^1.3.4",
+    "sharp": "^0.34.5"
   }
 }
