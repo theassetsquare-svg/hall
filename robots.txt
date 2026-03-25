@@ -28,4 +28,4 @@ Allow: /
 User-agent: Yeti
 Allow: /
 
-Sitemap: https://ilsan-myeongwolgwan.pages.dev/sitemap.xml
+Sitemap: https://hall-8i2.pages.dev/sitemap.xml
