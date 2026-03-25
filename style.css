@@ -51,6 +51,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-seri
 .page-header{padding:48px 20px 32px;background:var(--surface);border-bottom:1px solid var(--border)}
 .page-header h1{font-size:clamp(1.3rem,3.5vw,1.8rem);font-weight:800;color:var(--text);margin-bottom:6px}
 .page-header p{color:var(--sub);font-size:.95rem}
+.h1-brand{display:block;font-size:.45em;font-weight:400;color:var(--sub);margin-top:4px;letter-spacing:0}
 
 /* Section */
 section{padding:40px 0}
