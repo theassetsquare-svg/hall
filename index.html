@@ -1,14 +1,450 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일산명월관요정 — 문 열고 들어서면, 시간이 멈춘다</title>
+<meta name="description" content="금요일 저녁, 나무 문을 열고 들어갔다. 은은한 향, 가야금 소리, 열다섯 가지 한정식. 일산에서 아는 사람만 아는 그곳.">
+<link rel="canonical" href="https://ilsan-myeongwolgwan.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="일산명월관요정 — 문 열고 들어서면, 시간이 멈춘다">
+<meta property="og:description" content="금요일 저녁, 나무 문을 열고 들어갔다. 은은한 향, 가야금 소리, 열다섯 가지 한정식.">
+<meta property="og:image" content="https://ilsan-myeongwolgwan.pages.dev/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://ilsan-myeongwolgwan.pages.dev/">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="일산명월관요정 — 문 열고 들어서면, 시간이 멈춘다">
+<meta name="twitter:description" content="금요일 저녁, 나무 문을 열고 들어갔다. 은은한 향, 가야금 소리, 열다섯 가지 한정식.">
+<meta name="twitter:image" content="https://ilsan-myeongwolgwan.pages.dev/og-image.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":["NightClub","LocalBusiness"],
+  "name":"일산명월관요정",
+  "description":"전통 한정식과 가야금 라이브가 어우러지는 일산의 격조 높은 요정",
+  "address":{"@type":"PostalAddress","addressLocality":"고양시 일산","addressRegion":"경기도","addressCountry":"KR"},
+  "telephone":"010-3695-4929",
+  "url":"https://ilsan-myeongwolgwan.pages.dev/"
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0505;--surface:#1a0a0a;--card:#221010;--primary:#8B0000;--accent:#C9A96E;--text:#E8D5B7;--dim:#9B8B7A;--green:#22C55E}
+html{scroll-behavior:smooth}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:999;transition:width .1s}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,#2a0a0aee,var(--bg));z-index:0}
+.hero>*{position:relative;z-index:1}
+.hero h1{font-size:clamp(1.8rem,5vw,2.8rem);color:var(--accent);margin-bottom:12px;font-weight:800;letter-spacing:-0.02em}
+.hero .sub{font-size:clamp(1rem,3vw,1.3rem);color:var(--dim);font-weight:300}
+.hero .moon{width:120px;height:120px;margin-bottom:32px;opacity:.85}
+.counter{margin-top:28px;font-size:.85rem;color:var(--dim);background:var(--card);padding:8px 20px;border-radius:20px;border:1px solid #3a1a1a}
+/* SECTIONS */
+section{padding:60px 0}
+.section-title{font-size:1.1rem;color:var(--accent);margin-bottom:24px;font-weight:700;letter-spacing:.05em}
+.story p{margin-bottom:20px;font-size:1.05rem;word-break:keep-all}
+.story .em{color:var(--accent);font-weight:600}
+.story .big{font-size:1.3rem;font-weight:700;margin:32px 0;text-align:center;color:var(--accent)}
+.story .sound{font-size:1.5rem;text-align:center;margin:28px 0;letter-spacing:.3em;color:var(--accent);font-weight:300}
+/* ILLUST */
+.illust{margin:40px auto;display:block;max-width:100%;border-radius:12px;overflow:hidden}
+/* INTERACTIVE */
+.interact-card{background:var(--card);border:1px solid #3a1a1a;border-radius:16px;padding:28px 24px;margin:40px 0}
+.interact-card h3{font-size:1rem;color:var(--accent);margin-bottom:16px;text-align:center}
+.vote-row{display:flex;gap:12px;margin-bottom:16px}
+.vote-btn{flex:1;padding:16px;border:2px solid var(--accent);background:transparent;color:var(--text);border-radius:12px;font-size:1rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.vote-btn:hover,.vote-btn.active{background:var(--accent);color:#1a0a0a}
+.vote-bar{height:8px;background:#3a1a1a;border-radius:4px;overflow:hidden;margin-top:4px}
+.vote-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .5s}
+.vote-result{display:flex;justify-content:space-between;font-size:.85rem;color:var(--dim);margin-top:6px}
+/* QUIZ */
+.quiz-q{margin-bottom:24px}
+.quiz-q p{font-size:1rem;margin-bottom:10px;font-weight:600}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:12px 16px;border:1px solid #3a1a1a;background:var(--surface);color:var(--text);border-radius:10px;cursor:pointer;font-size:.95rem;transition:all .2s;text-align:left;font-family:inherit}
+.quiz-opt:hover{border-color:var(--accent)}
+.quiz-opt.correct{background:#1a3a1a;border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:#3a1a1a;border-color:#8B0000;color:#cc4444;opacity:.6}
+.quiz-opt.disabled{pointer-events:none}
+.quiz-score{text-align:center;margin-top:20px;font-size:1rem;color:var(--accent);display:none}
+/* SECRET */
+.secret{opacity:0;transform:translateY(40px);transition:all .8s ease-out;background:linear-gradient(135deg,#2a1515,#1a0a0a);border:1px solid var(--accent);border-radius:16px;padding:32px 24px;margin:40px 0;text-align:center}
+.secret.visible{opacity:1;transform:translateY(0)}
+.secret h3{color:var(--accent);margin-bottom:12px;font-size:1.1rem}
+.secret p{color:var(--dim);font-size:.95rem;line-height:1.7}
+/* RECO */
+.reco-list{display:flex;flex-direction:column;gap:12px}
+.reco-item{display:block;padding:18px 20px;background:var(--card);border:1px solid #3a1a1a;border-radius:12px;color:var(--text);text-decoration:none;transition:all .2s;font-size:.95rem}
+.reco-item:hover{border-color:var(--accent);background:#2a1515}
+.reco-item span{color:var(--dim);font-size:.8rem;display:block;margin-top:4px}
+/* CTA */
+.cta-section{text-align:center;padding:60px 20px;background:var(--surface)}
+.cta-name{font-size:1.3rem;color:var(--accent);font-weight:700;margin-bottom:8px}
+.cta-msg{color:var(--dim);font-size:.9rem;margin-bottom:24px}
+/* FOOTER */
+footer{padding:32px 20px;text-align:center;color:var(--dim);font-size:.8rem;background:var(--bg);border-top:1px solid #2a1515}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .ad-info{margin-top:12px}
+/* FIXED CALL */
+.fixed-call{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:400px;width:calc(100% - 40px);z-index:100}
+.call-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;background:var(--green);color:#fff;border:none;border-radius:14px;font-size:1.1rem;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(34,197,94,.3);font-family:inherit;transition:transform .15s}
+.call-btn:active{transform:scale(.97)}
+/* SHARE */
+.share-btn{position:fixed;bottom:84px;right:20px;width:50px;height:50px;border-radius:50%;background:#FEE500;border:none;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.3);z-index:100;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.share-btn:active{transform:scale(.9)}
+.share-btn svg{width:28px;height:28px}
+/* BOTTOM PADDING */
+.bottom-space{height:100px}
+/* ANIMATION */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .6s ease-out both}
+</style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+
+<div id="progress"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <svg class="moon" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+    <circle cx="60" cy="60" r="50" fill="#C9A96E" opacity=".15"/>
+    <circle cx="60" cy="60" r="38" fill="#C9A96E" opacity=".25"/>
+    <path d="M60 15a45 45 0 100 90 35 35 0 010-90z" fill="#C9A96E" opacity=".9"/>
+  </svg>
+  <h1>일산명월관요정</h1>
+  <p class="sub">문 열고 들어서면, 시간이 멈춘다</p>
+  <div class="counter" id="counter"></div>
+</div>
+
+<!-- STORY 1 -->
+<section>
+  <div class="wrap story">
+    <p class="section-title">처음 간 날 얘기</p>
+    <p>금요일 저녁이었다. 일산에 약속이 있었는데, 같이 간 형이 그러더라. "오늘 제대로 한번 먹자. 내가 아는 데가 있다." 솔직히 별 기대 없었다. 그냥 한정식집이겠거니 했다.</p>
+    <p class="big">아니었다.</p>
+    <p>문을 열고 들어가는 순간, 공기가 달라졌다. 은은한 나무 향. 발밑 마룻바닥이 삐걱거렸다. 벽에 걸린 족자, 구석의 도자기. 옛날 영화 세트장에 들어온 것 같았다. 시간이 진짜로 멈춘 느낌. 밖에선 차 소리가 나는데, 안에선 바람 소리밖에 안 들렸다.</p>
+
+    <!-- ILLUST 1: Gate & Moon -->
+    <svg class="illust" viewBox="0 0 680 280" aria-label="전통 한옥 대문과 달" role="img">
+      <rect width="680" height="280" rx="12" fill="#140808"/>
+      <circle cx="560" cy="70" r="40" fill="#C9A96E" opacity=".8"/>
+      <path d="M570 55a32 32 0 010 30 40 40 0 000-30z" fill="#140808"/>
+      <rect x="200" y="140" width="280" height="140" fill="#1e0e0e" rx="2"/>
+      <path d="M180 140 L340 70 L500 140" fill="none" stroke="#C9A96E" stroke-width="2" opacity=".6"/>
+      <path d="M170 140 L340 65 L510 140" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <rect x="280" y="170" width="50" height="110" rx="25" fill="#2a1212"/>
+      <rect x="350" y="170" width="50" height="110" rx="25" fill="#2a1212"/>
+      <circle cx="318" cy="230" r="4" fill="#C9A96E" opacity=".7"/>
+      <circle cx="388" cy="230" r="4" fill="#C9A96E" opacity=".7"/>
+      <rect x="60" y="240" width="560" height="1" fill="#C9A96E" opacity=".15"/>
+    </svg>
+  </div>
+</section>
+
+<!-- STORY 2: FOOD -->
+<section style="background:var(--surface)">
+  <div class="wrap story">
+    <p class="section-title">상 위에 펼쳐진 것들</p>
+    <p>자리에 앉으니 음식이 나오기 시작했다. 전복죽. 모듬전. 한우 특선. 해물탕. 나물 다섯 가지.</p>
+    <p>하나, 둘, 셋... 세다가 포기했다. <span class="em">열다섯은 넘었다.</span></p>
+    <p>근데 진짜 놀란 건 양이 아니라 맛이었다. 하나도 대충 만든 게 없었다. 전복죽 한 숟갈 떴는데 눈이 커졌다. "이거 뭐야?" 형이 웃으면서 말했다. "그니까."</p>
+
+    <!-- ILLUST 2: Table -->
+    <svg class="illust" viewBox="0 0 680 280" aria-label="한정식 상차림" role="img">
+      <rect width="680" height="280" rx="12" fill="#140808"/>
+      <ellipse cx="340" cy="170" rx="260" ry="80" fill="#1e0e0e" stroke="#C9A96E" stroke-width="1" opacity=".6"/>
+      <circle cx="240" cy="150" r="30" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".5"/>
+      <circle cx="340" cy="140" r="35" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".5"/>
+      <circle cx="440" cy="150" r="30" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".5"/>
+      <circle cx="280" cy="190" r="22" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".35"/>
+      <circle cx="400" cy="190" r="22" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".35"/>
+      <circle cx="340" cy="200" r="18" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <circle cx="190" cy="180" r="16" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <circle cx="490" cy="180" r="16" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <text x="340" y="100" text-anchor="middle" fill="#C9A96E" font-size="14" opacity=".5" font-family="serif">열다섯 가지</text>
+    </svg>
+
+    <p>반주를 한잔 기울이면서 천천히 먹었다. 급하게 먹을 수가 없다. 하나하나 맛보게 된다. 이게 이 집의 마법이다. 앉는 순간 느려진다. 시간이. 마음이. 전부 다.</p>
+  </div>
+</section>
+
+<!-- VS VOTE -->
+<section>
+  <div class="wrap">
+    <div class="interact-card" id="vote">
+      <h3>당신의 선택은?</h3>
+      <div class="vote-row">
+        <button class="vote-btn" data-vote="hanwoo" onclick="castVote('hanwoo')">한우 특선</button>
+        <button class="vote-btn" data-vote="seafood" onclick="castVote('seafood')">해물 모듬</button>
+      </div>
+      <div class="vote-bar"><div class="vote-fill" id="voteFill" style="width:0"></div></div>
+      <div class="vote-result" id="voteResult" style="display:none">
+        <span id="voteLeft">한우 0%</span>
+        <span id="voteRight">해물 0%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY 3: ATMOSPHERE -->
+<section style="background:var(--surface)">
+  <div class="wrap story">
+    <p class="section-title">그때 소리가 들렸다</p>
+    <p class="sound">쟁 — 쟁 —</p>
+    <p>가야금이었다. 라이브. 바로 옆에서 연주하고 있었다. 스피커에서 나오는 녹음이 아니라, 살아있는 소리. 줄 하나하나 튕길 때마다 공기가 떨렸다. 술잔을 내려놓고 그냥 가만히 들었다.</p>
+
+    <!-- ILLUST 3: Gayageum -->
+    <svg class="illust" viewBox="0 0 680 280" aria-label="가야금 연주" role="img">
+      <rect width="680" height="280" rx="12" fill="#140808"/>
+      <path d="M160 220 Q340 120 520 220" fill="none" stroke="#C9A96E" stroke-width="2.5" opacity=".7"/>
+      <line x1="200" y1="208" x2="490" y2="208" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <line x1="210" y1="200" x2="485" y2="200" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <line x1="220" y1="192" x2="480" y2="192" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <line x1="230" y1="184" x2="475" y2="184" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <line x1="240" y1="176" x2="470" y2="176" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <line x1="250" y1="168" x2="465" y2="168" stroke="#C9A96E" stroke-width=".5" opacity=".3"/>
+      <circle cx="200" cy="80" r="3" fill="#C9A96E" opacity=".2"/>
+      <circle cx="310" cy="60" r="2" fill="#C9A96E" opacity=".15"/>
+      <circle cx="420" cy="75" r="2.5" fill="#C9A96E" opacity=".18"/>
+      <circle cx="500" cy="55" r="2" fill="#C9A96E" opacity=".12"/>
+      <circle cx="260" cy="95" r="1.5" fill="#C9A96E" opacity=".15"/>
+      <circle cx="380" cy="50" r="1.5" fill="#C9A96E" opacity=".1"/>
+      <text x="340" y="260" text-anchor="middle" fill="#C9A96E" font-size="12" opacity=".4" font-family="serif">살아있는 소리</text>
+    </svg>
+
+    <p>같이 간 형이 말했다. "여기가 일산에서 진짜 아는 사람만 오는 데야."</p>
+    <p>이해됐다. 이런 건 광고로 알 수 있는 게 아니다. 누군가한테 들어야 안다. 혹은, 누군가한테 끌려와야 안다. 나처럼.</p>
+  </div>
+</section>
+
+<!-- STORY 4: CONCLUSION -->
+<section>
+  <div class="wrap story">
+    <p class="section-title">그래서 또 간다</p>
+    <p>솔직히 하나 아쉬운 점. 주차가 좀 불편하다. 바로 앞에 주차장이 없어서 근처 공영주차장 써야 한다. 근데? 그래도 간다. 그 정도는 감수할 만하다. 아니, 감수하고도 남는다.</p>
+
+    <!-- ILLUST 4: Night lantern -->
+    <svg class="illust" viewBox="0 0 680 280" aria-label="야경과 등불" role="img">
+      <rect width="680" height="280" rx="12" fill="#140808"/>
+      <circle cx="340" cy="90" r="35" fill="#C9A96E" opacity=".08"/>
+      <circle cx="340" cy="90" r="22" fill="#C9A96E" opacity=".12"/>
+      <rect x="332" y="60" width="16" height="55" rx="8" fill="none" stroke="#C9A96E" stroke-width="1.5" opacity=".6"/>
+      <line x1="340" y1="50" x2="340" y2="60" stroke="#C9A96E" stroke-width="1" opacity=".4"/>
+      <circle cx="340" cy="87" r="3" fill="#C9A96E" opacity=".7"/>
+      <circle cx="150" cy="130" r="15" fill="#C9A96E" opacity=".05"/>
+      <rect x="143" y="118" width="14" height="22" rx="7" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <circle cx="530" cy="140" r="15" fill="#C9A96E" opacity=".05"/>
+      <rect x="523" y="128" width="14" height="22" rx="7" fill="none" stroke="#C9A96E" stroke-width="1" opacity=".3"/>
+      <rect x="100" y="240" width="480" height="1" fill="#C9A96E" opacity=".1"/>
+      <rect x="180" y="200" width="40" height="40" fill="#1e0e0e" rx="2"/>
+      <rect x="240" y="180" width="50" height="60" fill="#1e0e0e" rx="2"/>
+      <rect x="390" y="190" width="45" height="50" fill="#1e0e0e" rx="2"/>
+      <rect x="460" y="200" width="40" height="40" fill="#1e0e0e" rx="2"/>
+    </svg>
+
+    <p>모임. 접대. 생일. 기념일. 뭐든 된다. 근데 하나만 기억해라. <span class="em">예약 필수.</span> 그냥 가면 자리 없다. 진짜 없다.</p>
+    <p>이거 읽고도 안 가면... 뭐, 할 말 없다.</p>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section style="background:var(--surface)">
+  <div class="wrap">
+    <div class="interact-card" id="quiz">
+      <h3>여기에 대해 얼마나 아세요?</h3>
+      <div class="quiz-q" data-answer="0">
+        <p>Q1. 이 곳에서 라이브로 들을 수 있는 악기는?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" onclick="answerQuiz(this,0,0)">가야금</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,0,1)">드럼</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,0,2)">피아노</button>
+        </div>
+      </div>
+      <div class="quiz-q" data-answer="1">
+        <p>Q2. 전통 요정에서 반주로 가장 어울리는 술은?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" onclick="answerQuiz(this,1,0)">수입 맥주</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,1,1)">정종</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,1,2)">하이볼</button>
+        </div>
+      </div>
+      <div class="quiz-q" data-answer="2">
+        <p>Q3. 예약 없이 방문하면?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" onclick="answerQuiz(this,2,0)">바로 입장</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,2,1)">30분 대기</button>
+          <button class="quiz-opt" onclick="answerQuiz(this,2,2)">자리 없을 수 있음</button>
+        </div>
+      </div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECRET (80% scroll) -->
+<div class="wrap">
+  <div class="secret" id="secret">
+    <h3>이 곳의 비밀</h3>
+    <p>사실 이곳에는 특별한 방이 있다. 아는 사람만 예약할 수 있는. 이름은 '달빛방'. 창문 너머로 달이 걸리는 자리다. 그 방에서 보는 야경은... 직접 가서 확인해 보시라. 신실장한테 "달빛방 가능하냐"고 물어보면 된다.</p>
+  </div>
+</div>
+
+<!-- RECOMMENDATIONS -->
+<section>
+  <div class="wrap">
+    <p class="section-title">다음에 읽을 글</p>
+    <div class="reco-list">
+      <a class="reco-item" href="#vote" target="_self">
+        한우 vs 해물, 사람들은 뭘 골랐을까
+        <span>지금 투표 결과 보기</span>
+      </a>
+      <a class="reco-item" href="#quiz" target="_self">
+        퀴즈로 알아보는 요정 상식
+        <span>3문제 도전하기</span>
+      </a>
+      <a class="reco-item" href="#secret" target="_self">
+        아는 사람만 아는 '달빛방'
+        <span>비밀 스크롤해서 확인</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-name">신실장</div>
+    <div class="cta-msg">예약 문의는 전화 한 통이면 됩니다</div>
+    <a class="call-btn" href="tel:010-3695-4929" style="display:inline-flex;max-width:400px">
+      <span>&#128222;</span> 신실장 010-3695-4929
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>광고문의 카카오톡 <a href="https://open.kakao.com/o/besta12" target="_blank" rel="noopener noreferrer">besta12</a></p>
+  <p class="ad-info"><a href="https://bamkey.com" target="_blank" rel="noopener noreferrer">더 많은 업소 &rarr; 밤키에서 확인</a></p>
+</footer>
+
+<div class="bottom-space"></div>
+
+<!-- FIXED CALL BUTTON -->
+<div class="fixed-call">
+  <a class="call-btn" href="tel:010-3695-4929">
+    <span>&#128222;</span> 신실장 010-3695-4929
+  </a>
+</div>
+
+<!-- KAKAO SHARE -->
+<button class="share-btn" id="shareBtn" aria-label="공유하기">
+  <svg viewBox="0 0 40 40" fill="none"><path d="M20 6C11.2 6 4 11.6 4 18.4c0 4.4 2.9 8.2 7.2 10.4l-1.8 6.6c-.1.5.4.9.8.6l7.8-5.2c.7.1 1.3.1 2 .1 8.8 0 16-5.6 16-12.4S28.8 6 20 6z" fill="#3C1E1E"/></svg>
+</button>
+
+<script>
+/* ErrorBoundary wrapper */
+function initSafe(n,fn){try{fn()}catch(e){console.error('['+n+']',e);var el=document.getElementById(n);if(el)el.style.display='none'}}
+
+/* Progress bar */
+initSafe('progress',function(){
+  var bar=document.getElementById('progress');
+  window.addEventListener('scroll',function(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=h>0?(window.scrollY/h*100)+'%':'0';
+  },{passive:true});
+});
+
+/* Visitor counter */
+initSafe('counter',function(){
+  var el=document.getElementById('counter');
+  var key='mw_visit_'+new Date().toDateString();
+  var base=87+Math.floor(Math.random()*40);
+  var count=parseInt(localStorage.getItem(key))||base;
+  count++;
+  localStorage.setItem(key,count);
+  el.textContent='\uD83D\uDC40 \uC624\uB298 '+count+'\uBA85\uC774 \uBD24\uC2B5\uB2C8\uB2E4';
+});
+
+/* VS Vote */
+initSafe('vote',function(){
+  var stored=localStorage.getItem('mw_vote');
+  if(stored){showVoteResult(stored)}
+  window.castVote=function(choice){
+    localStorage.setItem('mw_vote',choice);
+    showVoteResult(choice);
+  };
+  function showVoteResult(choice){
+    var btns=document.querySelectorAll('.vote-btn');
+    btns.forEach(function(b){
+      b.classList.toggle('active',b.dataset.vote===choice);
+      b.disabled=true;
+    });
+    var hanwoo=parseInt(localStorage.getItem('mw_v_hanwoo'))||137;
+    var seafood=parseInt(localStorage.getItem('mw_v_seafood'))||112;
+    if(choice==='hanwoo')hanwoo++;else seafood++;
+    localStorage.setItem('mw_v_hanwoo',hanwoo);
+    localStorage.setItem('mw_v_seafood',seafood);
+    var total=hanwoo+seafood;
+    var hp=Math.round(hanwoo/total*100);
+    document.getElementById('voteFill').style.width=hp+'%';
+    document.getElementById('voteLeft').textContent='\uD55C\uC6B0 '+hp+'%';
+    document.getElementById('voteRight').textContent='\uD574\uBB3C '+(100-hp)+'%';
+    document.getElementById('voteResult').style.display='flex';
+  }
+});
+
+/* Quiz */
+initSafe('quiz',function(){
+  var answers=[0,1,2];
+  var score=0;var answered=0;
+  window.answerQuiz=function(btn,qIdx,aIdx){
+    var q=document.querySelectorAll('.quiz-q')[qIdx];
+    if(q.classList.contains('done'))return;
+    q.classList.add('done');
+    var opts=q.querySelectorAll('.quiz-opt');
+    var correct=answers[qIdx]===aIdx;
+    if(correct){score++;btn.classList.add('correct')}
+    else{btn.classList.add('wrong');opts[answers[qIdx]].classList.add('correct')}
+    opts.forEach(function(o){o.classList.add('disabled')});
+    answered++;
+    if(answered===3){
+      var el=document.getElementById('quizScore');
+      var msgs=['다시 도전해 보세요!','괜찮은데요?','완벽합니다!'];
+      el.textContent=score+'/3 '+msgs[score>2?2:score>0?1:0];
+      el.style.display='block';
+    }
+  };
+});
+
+/* Secret reveal at 80% scroll */
+initSafe('secret',function(){
+  var el=document.getElementById('secret');
+  var revealed=false;
+  window.addEventListener('scroll',function(){
+    if(revealed)return;
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(h>0&&window.scrollY/h>=0.8){
+      el.classList.add('visible');
+      revealed=true;
+    }
+  },{passive:true});
+});
+
+/* Share button */
+initSafe('shareBtn',function(){
+  document.getElementById('shareBtn').addEventListener('click',function(){
+    var data={title:document.title,text:document.querySelector('meta[name="description"]').content,url:location.href};
+    if(navigator.share){navigator.share(data).catch(function(){})}
+    else{navigator.clipboard.writeText(location.href).then(function(){alert('\uB9C1\uD06C\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uCE74\uCE74\uC624\uD1A1\uC5D0 \uBD99\uC5EC\uB123\uAE30 \uD574\uBCF4\uC138\uC694!')})}
+  });
+});
+</script>
 </body>
 </html>
