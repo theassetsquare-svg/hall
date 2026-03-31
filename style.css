@@ -14,7 +14,7 @@
   --radius:12px;
 }
 html{scroll-behavior:smooth}
-body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;-webkit-font-smoothing:antialiased}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-serif;font-size:16px;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
 
 /* Progress */
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:1000;transition:width .1s}
@@ -134,6 +134,13 @@ footer a{color:var(--accent);text-decoration:underline}
 
 /* Bottom space */
 .bottom-space{height:90px}
+@media(min-width:768px){
+  .fixed-call{position:static;transform:none;max-width:400px;margin:0 auto 24px;width:100%}
+  .bottom-space{height:24px}
+  .autonext-bar{bottom:24px}
+  .spin-fab{bottom:24px}
+  .explore-tracker{bottom:24px}
+}
 
 /* ============================================
    ★ 체류시간 극대화 CSS ★
@@ -149,7 +156,7 @@ footer a{color:var(--accent);text-decoration:underline}
 .reward-emoji{font-size:1.4rem}
 
 /* 7. 넷플릭스 자동재생 카운트다운 */
-.autonext-bar{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(120%);max-width:400px;width:calc(100% - 40px);background:#111;color:#fff;border-radius:16px;padding:20px;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.2,.64,1);opacity:0}
+.autonext-bar{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(120%);max-width:400px;width:calc(100% - 40px);background:#111;color:#fff;border-radius:16px;padding:20px;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.2,.64,1);opacity:0}
 .autonext-bar.autonext-visible{transform:translateX(-50%) translateY(0);opacity:1}
 .autonext-label{font-size:.75rem;color:#999;letter-spacing:.05em}
 .autonext-title{display:block;font-size:1.1rem;font-weight:700;margin:4px 0 12px}
@@ -167,7 +174,7 @@ footer a{color:var(--accent);text-decoration:underline}
 
 /* 9. 리액션 버튼 */
 .react-bar{display:flex;gap:6px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
-.react-btn{position:relative;display:flex;align-items:center;gap:4px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:.85rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.react-btn{position:relative;display:flex;align-items:center;gap:4px;padding:10px 14px;min-height:44px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:.85rem;cursor:pointer;transition:all .2s;font-family:inherit}
 .react-btn:hover{border-color:var(--accent);background:#fff5f5}
 .react-btn.reacted{border-color:var(--accent);background:#fff0f0;transform:scale(1.05)}
 .react-count{font-size:.75rem;color:var(--sub)}
@@ -187,7 +194,7 @@ footer a{color:var(--accent);text-decoration:underline}
 .content-locked{filter:blur(4px);pointer-events:none;transition:filter .5s}
 
 /* 13. 럭키 스핀 */
-.spin-fab{position:fixed;bottom:84px;right:16px;width:48px;height:48px;border-radius:50%;background:#111;border:2px solid var(--gold);font-size:1.3rem;cursor:pointer;z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform .15s;display:flex;align-items:center;justify-content:center}
+.spin-fab{position:fixed;bottom:90px;right:16px;width:48px;height:48px;border-radius:50%;background:#111;border:2px solid var(--gold);font-size:1.3rem;cursor:pointer;z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform .15s;display:flex;align-items:center;justify-content:center}
 .spin-fab:active{transform:scale(.9)}
 .spin-fab.spinning{animation:slot-spin 1.5s ease-in-out}
 @keyframes slot-spin{0%{transform:rotate(0)}25%{transform:rotate(180deg)}50%{transform:rotate(360deg) scale(1.2)}75%{transform:rotate(540deg)}100%{transform:rotate(720deg) scale(1)}}
@@ -202,7 +209,7 @@ footer a{color:var(--accent);text-decoration:underline}
 .story .big{border-right:2px solid transparent}
 
 /* 15. 탐험 진행도 트래커 */
-.explore-tracker{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(120%);max-width:400px;width:calc(100% - 40px);z-index:98;opacity:0;transition:all .4s cubic-bezier(.34,1.2,.64,1)}
+.explore-tracker{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(120%);max-width:400px;width:calc(100% - 40px);z-index:98;opacity:0;transition:all .4s cubic-bezier(.34,1.2,.64,1)}
 .explore-tracker.explore-show{transform:translateX(-50%) translateY(0);opacity:1}
 .explore-inner{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:0 8px 30px rgba(0,0,0,.12);position:relative}
 .explore-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px}
