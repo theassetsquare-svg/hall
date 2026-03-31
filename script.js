@@ -141,7 +141,7 @@ safe('auto-next',function(){
     });
   },{threshold:0.5});
 
-  var footer=qs('.bamkey-section')||qs('footer');
+  var footer=qs('.nolcool-section')||qs('footer');
   if(footer)obs.observe(footer);
 
   document.getElementById('anGo').addEventListener('click',function(){

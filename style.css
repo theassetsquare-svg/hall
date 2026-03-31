@@ -117,11 +117,11 @@ section{padding:40px 0}
 .room-info p{font-size:.85rem;color:var(--sub)}
 
 /* Bamkey */
-.bamkey-section{padding:40px 20px;text-align:center;background:var(--surface);border-top:1px solid var(--border)}
-.bamkey-text{color:var(--sub);font-size:.9rem;margin-bottom:14px}
-.bamkey-text strong{color:var(--text)}
-.bamkey-link{display:inline-block;padding:12px 28px;background:var(--text);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:600;font-size:.93rem;transition:opacity .2s}
-.bamkey-link:hover{opacity:.85}
+.nolcool-section{padding:40px 20px;text-align:center;background:var(--surface);border-top:1px solid var(--border)}
+.nolcool-text{color:var(--sub);font-size:.9rem;margin-bottom:14px}
+.nolcool-text strong{color:var(--text)}
+.nolcool-link{display:inline-block;padding:12px 28px;background:var(--text);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:600;font-size:.93rem;transition:opacity .2s}
+.nolcool-link:hover{opacity:.85}
 
 /* Footer */
 footer{padding:24px 20px;text-align:center;color:var(--sub);font-size:.8rem;border-top:1px solid var(--border)}
