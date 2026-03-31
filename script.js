@@ -1,6 +1,6 @@
 /* ============================================
-   체류시간 극대화 엔진 v2.0
-   틱톡 / 넷플릭스 / 슬롯머신 심리학 적용
+   체류시간 극대화 엔진 v3.0
+   빈 화면 방지 + 메모리 누수 수정
    ============================================ */
 
 /* --- 0. 유틸 --- */
@@ -8,6 +8,46 @@ function qs(s,p){return(p||document).querySelector(s)}
 function qsa(s,p){return(p||document).querySelectorAll(s)}
 function ce(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e}
 function safe(name,fn){try{fn()}catch(e){console.warn('['+name+']',e)}}
+
+/* --- 글로벌 에러 핸들러 (빈 화면 방지) --- */
+window.onerror=function(msg,url,line){
+  console.warn('Global error caught:',msg,url,line);
+  return true;
+};
+window.addEventListener('unhandledrejection',function(e){
+  console.warn('Unhandled rejection:',e.reason);
+  e.preventDefault();
+});
+
+/* --- 타이머 관리 (메모리 누수 방지) --- */
+var _timers=[];
+function managedInterval(fn,ms){
+  var id=setInterval(fn,ms);
+  _timers.push({id:id,type:'interval'});
+  return id;
+}
+function managedTimeout(fn,ms){
+  var id=setTimeout(fn,ms);
+  _timers.push({id:id,type:'timeout'});
+  return id;
+}
+
+/* 탭 비활성 시 모든 interval 일시정지 */
+var _paused=false;
+var _pausedTimers=[];
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){
+    _paused=true;
+    _timers.forEach(function(t){
+      if(t.type==='interval'){clearInterval(t.id)}
+    });
+    _pausedTimers=_timers.filter(function(t){return t.type==='interval'});
+    _timers=_timers.filter(function(t){return t.type!=='interval'});
+  } else {
+    _paused=false;
+    /* intervals는 재시작하지 않음 — 이미 1회성 작업이거나 다시 필요 없음 */
+  }
+});
 
 /* --- 페이지 순서 (넷플릭스 자동재생) --- */
 var PAGE_ORDER=['/','/tradition','/music','/rooms','/atmosphere','/review','/faq','/contact'];
@@ -106,7 +146,7 @@ function showReward(emoji,msg){
   var el=ce('div','reward-popup','<span class="reward-emoji">'+emoji+'</span><span>'+msg+'</span>');
   document.body.appendChild(el);
   requestAnimationFrame(function(){el.classList.add('reward-show')});
-  setTimeout(function(){el.classList.remove('reward-show');setTimeout(function(){el.remove()},400)},2500);
+  managedTimeout(function(){el.classList.remove('reward-show');managedTimeout(function(){el.remove()},400)},2500);
 }
 
 /* === 7. 넷플릭스 자동재생 카운트다운 === */
@@ -132,7 +172,8 @@ safe('auto-next',function(){
       if(en.isIntersecting&&!started){
         started=true;
         bar.classList.add('autonext-visible');
-        timer=setInterval(function(){
+        timer=managedInterval(function(){
+          if(_paused)return;
           elapsed+=50;
           fill.style.width=(elapsed/duration*100)+'%';
           if(elapsed>=duration){clearInterval(timer);window.open(next.path,'_blank')}
@@ -152,7 +193,7 @@ safe('auto-next',function(){
   });
 });
 
-/* === 8. 실시간 활동 피드 (소셜 증거: 틱톡) === */
+/* === 8. 실시간 활동 피드 (소셜 증거) === */
 safe('live-feed',function(){
   var msgs=[
     '누군가가 한우 특선에 투표했습니다','방금 달빛방을 예약했습니다',
@@ -162,7 +203,13 @@ safe('live-feed',function(){
     '오늘 예약 17건 완료','가야금 라이브 요청이 접수됐습니다'
   ];
   var used=[];
+  var feedCount=0;
+  var maxFeeds=20; /* 최대 20회 후 중지 — 무한 루프 방지 */
+  var feedTimer=null;
+
   function showFeed(){
+    if(_paused||feedCount>=maxFeeds)return;
+    feedCount++;
     if(used.length>=msgs.length)used=[];
     var avail=msgs.filter(function(m){return used.indexOf(m)===-1});
     var msg=avail[Math.floor(Math.random()*avail.length)];
@@ -170,10 +217,13 @@ safe('live-feed',function(){
     var el=ce('div','live-toast','<span class="live-dot"></span>'+msg);
     document.body.appendChild(el);
     requestAnimationFrame(function(){el.classList.add('live-show')});
-    setTimeout(function(){el.classList.remove('live-show');setTimeout(function(){el.remove()},400)},3500);
+    managedTimeout(function(){el.classList.remove('live-show');managedTimeout(function(){el.remove()},400)},3500);
   }
-  setTimeout(showFeed,8000);
-  setInterval(showFeed,15000+Math.random()*10000);
+  managedTimeout(showFeed,8000);
+  feedTimer=managedInterval(function(){
+    if(feedCount>=maxFeeds){clearInterval(feedTimer);return}
+    showFeed();
+  },18000);
 });
 
 /* === 9. 리액션 버튼 (틱톡: 마이크로 인터랙션) === */
@@ -195,13 +245,12 @@ safe('reactions',function(){
         btn.classList.add('reacted');
         count++;localStorage.setItem(countKey,count);
         num.textContent=count;
-        // 도파민 파티클 이펙트
         for(var p=0;p<6;p++){
           var particle=ce('span','react-particle',em);
           particle.style.setProperty('--dx',(Math.random()*60-30)+'px');
           particle.style.setProperty('--dy',(-30-Math.random()*40)+'px');
           btn.appendChild(particle);
-          setTimeout(function(pp){pp.remove()}.bind(null,particle),600);
+          managedTimeout(function(pp){pp.remove()}.bind(null,particle),600);
         }
       });
       bar.appendChild(btn);
@@ -210,7 +259,7 @@ safe('reactions',function(){
   });
 });
 
-/* === 10. 체류시간 트래커 + 도전 (게이미피케이션) === */
+/* === 10. 체류시간 트래커 (localStorage 30초 간격으로 축소) === */
 safe('time-tracker',function(){
   var startTime=Date.now();
   var milestones=[
@@ -220,22 +269,33 @@ safe('time-tracker',function(){
     {sec:300,msg:'5분! 당신은 진정한 탐험가',emoji:'🏅',done:false},
     {sec:600,msg:'10분 달성! 명월관 마스터 인정',emoji:'👑',done:false}
   ];
-  setInterval(function(){
+
+  /* 마일스톤 체크: 1초 간격, 10분 후 자동 중지 */
+  var msTimer=managedInterval(function(){
+    if(_paused)return;
     var elapsed=Math.floor((Date.now()-startTime)/1000);
+    var allDone=true;
     milestones.forEach(function(m){
-      if(!m.done&&elapsed>=m.sec){m.done=true;showReward(m.emoji,m.msg)}
+      if(!m.done){allDone=false;if(elapsed>=m.sec){m.done=true;showReward(m.emoji,m.msg)}}
     });
-    // 총 체류시간 저장
-    var totalKey='mw_total_time';
-    var total=parseInt(localStorage.getItem(totalKey))||0;
-    localStorage.setItem(totalKey,total+1);
+    if(allDone)clearInterval(msTimer);
   },1000);
 
-  // 체류시간 표시 배지
+  /* localStorage 저장: 30초 간격 (1초→30초로 축소) */
+  var saveTimer=managedInterval(function(){
+    if(_paused)return;
+    var totalKey='mw_total_time';
+    var total=parseInt(localStorage.getItem(totalKey))||0;
+    localStorage.setItem(totalKey,total+30);
+  },30000);
+
+  /* 체류시간 배지: 1초 간격, 15분 후 중지 */
   var badge=ce('div','time-badge','<span id="timeBadge">0:00</span>');
   document.body.appendChild(badge);
-  setInterval(function(){
+  var badgeTimer=managedInterval(function(){
+    if(_paused)return;
     var s=Math.floor((Date.now()-startTime)/1000);
+    if(s>900){clearInterval(badgeTimer);return} /* 15분 후 중지 */
     var m=Math.floor(s/60);
     var ss=s%60;
     var tb=document.getElementById('timeBadge');
@@ -253,13 +313,13 @@ safe('streak',function(){
   else{streakData.count=1;streakData.last=today}
   localStorage.setItem('mw_streak',JSON.stringify(streakData));
   if(streakData.count>=2){
-    setTimeout(function(){
+    managedTimeout(function(){
       showReward('🔥',streakData.count+'일 연속 방문! 스트릭 유지 중');
     },3000);
   }
 });
 
-/* === 12. 숨겨진 콘텐츠 잠금해제 (슬롯머신: 서프라이즈) === */
+/* === 12. 숨겨진 콘텐츠 잠금해제 === */
 safe('hidden-unlock',function(){
   var stories=qsa('.story');
   if(stories.length<2)return;
@@ -285,13 +345,13 @@ safe('hidden-unlock',function(){
         lock.classList.add('lock-unlocked');
         target.classList.remove('content-locked');
         showReward('🔓','숨겨진 이야기 잠금해제!');
-        setTimeout(function(){lock.style.display='none'},1000);
+        managedTimeout(function(){lock.style.display='none'},1000);
       }
     }
   },{passive:true});
 });
 
-/* === 13. 럭키 스핀 휠 (슬롯머신 핵심: 가변 비율 보상) === */
+/* === 13. 럭키 스핀 휠 === */
 safe('spin-wheel',function(){
   var spinUsed=sessionStorage.getItem('mw_spin');
   if(spinUsed)return;
@@ -313,7 +373,7 @@ safe('spin-wheel',function(){
       {page:'/contact',text:'지금 바로 예약하기',emoji:'📞'}
     ];
     var pick=recommendations[Math.floor(Math.random()*recommendations.length)];
-    setTimeout(function(){
+    managedTimeout(function(){
       btn.classList.remove('spinning');
       var result=ce('div','spin-result',
         '<div class="spin-emoji">'+pick.emoji+'</div>'+
@@ -326,7 +386,7 @@ safe('spin-wheel',function(){
   });
 });
 
-/* === 14. 타이핑 효과 (틱톡: 시선 고정) === */
+/* === 14. 타이핑 효과 === */
 safe('typewriter',function(){
   var bigs=qsa('.story .big');
   if(!bigs.length)return;
@@ -340,7 +400,7 @@ safe('typewriter',function(){
       if(en.isIntersecting&&!typed){
         typed=true;obs.unobserve(target);
         var i=0;
-        var iv=setInterval(function(){
+        var iv=managedInterval(function(){
           target.textContent=text.substring(0,i+1);
           i++;
           if(i>=text.length){clearInterval(iv);target.style.borderRight='none'}
@@ -352,7 +412,7 @@ safe('typewriter',function(){
   obs.observe(target);
 });
 
-/* === 15. 페이지 탐색 진행도 (제이가르닉 효과: 미완성 과제 기억) === */
+/* === 15. 페이지 탐색 진행도 === */
 safe('page-progress',function(){
   var visited=JSON.parse(localStorage.getItem('mw_visited')||'[]');
   var current=location.pathname.replace(/\/$/,'')||'/';
@@ -375,17 +435,20 @@ safe('page-progress',function(){
       '<a href="'+nextSuggest+'" target="_blank" rel="noopener noreferrer" class="explore-go">'+PAGE_NAMES[nextIdx]+' 보러가기 →</a>'+
       '<button class="explore-close" onclick="this.parentNode.parentNode.remove()">✕</button>'+
       '</div>');
-    setTimeout(function(){
+    managedTimeout(function(){
       document.body.appendChild(tracker);
       requestAnimationFrame(function(){tracker.classList.add('explore-show')});
     },20000);
   }
 });
 
-/* === 16. 스크롤 속도 감지 + 관심도 분석 (넷플릭스: 개인화) === */
+/* === 16. 스크롤 속도 감지 (2초 간격으로 축소, 5분 후 중지) === */
 safe('scroll-speed',function(){
   var lastY=window.scrollY,slowCount=0;
-  setInterval(function(){
+  var startTime=Date.now();
+  var speedTimer=managedInterval(function(){
+    if(_paused)return;
+    if(Date.now()-startTime>300000){clearInterval(speedTimer);return} /* 5분 후 중지 */
     var speed=Math.abs(window.scrollY-lastY);
     lastY=window.scrollY;
     if(speed<5&&speed>0)slowCount++;
@@ -393,5 +456,5 @@ safe('scroll-speed',function(){
       slowCount=-999;
       showReward('🧐','천천히 읽고 있네요. 이 집 관심 있죠?');
     }
-  },500);
+  },2000);
 });
