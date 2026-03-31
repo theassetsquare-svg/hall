@@ -3,7 +3,7 @@ const opentype = require('opentype.js');
 const path = require('path');
 const fs = require('fs');
 
-const W = 1200, H = 630;
+const W = 1200, H = 1200;
 const FONT_BOLD = path.join(__dirname, 'fonts', 'NotoSansKR-Bold.otf');
 const FONT_REG = path.join(__dirname, 'fonts', 'NotoSansKR-Regular.otf');
 const OUT = path.join(__dirname, '..');
@@ -12,14 +12,14 @@ const fontBold = opentype.loadSync(FONT_BOLD);
 const fontReg = opentype.loadSync(FONT_REG);
 
 const pages = [
-  { file: 'og-image.png', title: '일산명월관요정', sub: '문 열고 들어서면, 시간이 멈춘다', contact: '신실장 010-3695-4929' },
-  { file: 'tradition/og-image.png', title: '15가지 한정식', sub: '하나하나의 이야기', contact: '일산명월관요정' },
-  { file: 'music/og-image.png', title: '국악 라이브의 감동', sub: '가야금 소리에 숨이 멎다', contact: '일산명월관요정' },
-  { file: 'rooms/og-image.png', title: '프라이빗 룸 30개', sub: '방마다 다른 분위기', contact: '일산명월관요정' },
-  { file: 'atmosphere/og-image.png', title: '분위기 갤러리', sub: '사진으로 담을 수 없는 공간', contact: '일산명월관요정' },
-  { file: 'review/og-image.png', title: '방문 후기', sub: '직접 다녀온 사람들의 솔직한 말', contact: '일산명월관요정' },
-  { file: 'faq/og-image.png', title: '자주 묻는 질문', sub: '가기 전에 궁금했던 것들', contact: '일산명월관요정' },
-  { file: 'contact/og-image.png', title: '신실장에게 바로 연결', sub: '전화 한 통이면 예약 끝', contact: '010-3695-4929' }
+  { file: 'og-image.png', title: '일산명월관요정', sub: '문 열고 들어서면, 시간이 멈춘다' },
+  { file: 'tradition/og-image.png', title: '일산명월관요정', sub: '15가지 한정식의 비밀' },
+  { file: 'music/og-image.png', title: '일산명월관요정', sub: '가야금 소리에 숨이 멎다' },
+  { file: 'rooms/og-image.png', title: '일산명월관요정', sub: '프라이빗 룸 30개' },
+  { file: 'atmosphere/og-image.png', title: '일산명월관요정', sub: '사진에 안 담기는 공간' },
+  { file: 'review/og-image.png', title: '일산명월관요정', sub: '다녀온 사람들의 솔직한 말' },
+  { file: 'faq/og-image.png', title: '일산명월관요정', sub: '가기 전에 궁금한 것 전부 답했다' },
+  { file: 'contact/og-image.png', title: '일산명월관요정', sub: '전화 한 통이면 예약 끝' }
 ];
 
 function textToPath(font, text, fontSize, cx, cy, fill) {
@@ -34,30 +34,59 @@ function textToPath(font, text, fontSize, cx, cy, fill) {
 }
 
 async function generateOG(page) {
-  const titlePath = textToPath(fontBold, page.title, 54, 600, 360, '#C9A96E');
-  const subPath = textToPath(fontReg, page.sub, 26, 600, 430, '#E8D5B7');
-  const contactPath = textToPath(fontReg, page.contact, 20, 600, 520, 'rgba(232,213,183,0.55)');
+  /* 신실장 — 가장 크게 (160px) */
+  const nickPath = textToPath(fontBold, '신실장', 160, 600, 420, '#FFFFFF');
+
+  /* 일산명월관요정 — 상단 (42px) */
+  const titlePath = textToPath(fontBold, page.title, 42, 600, 200, '#C9A96E');
+
+  /* 서브타이틀 (28px) */
+  const subPath = textToPath(fontReg, page.sub, 28, 600, 680, '#E8D5B7');
+
+  /* 전화번호 (24px) */
+  const telPath = textToPath(fontReg, '010-3695-4929', 24, 600, 780, 'rgba(232,213,183,0.7)');
+
+  /* 밤의 달 아이콘 */
+  const moonSvg = `
+    <circle cx="600" cy="100" r="40" fill="#C9A96E" opacity="0.25"/>
+    <circle cx="615" cy="90" r="33" fill="#6a0000"/>
+  `;
+
+  /* 구분선 */
+  const divider = `<line x1="350" y1="730" x2="850" y2="730" stroke="#C9A96E" stroke-width="1" opacity="0.35"/>`;
+
+  /* 놀쿨 브랜딩 */
+  const brandPath = textToPath(fontReg, '놀쿨에서 확인', 18, 600, 850, 'rgba(232,213,183,0.4)');
 
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#8B0000"/>
-      <stop offset="100%" stop-color="#4a0000"/>
+      <stop offset="50%" stop-color="#5a0000"/>
+      <stop offset="100%" stop-color="#3a0000"/>
     </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="35%" r="45%">
-      <stop offset="0%" stop-color="#C9A96E" stop-opacity="0.12"/>
+    <radialGradient id="glow" cx="50%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="#C9A96E" stop-opacity="0.1"/>
       <stop offset="100%" stop-color="#C9A96E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nickGlow" cx="50%" cy="38%" r="30%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
   <rect width="${W}" height="${H}" fill="url(#glow)"/>
-  <circle cx="600" cy="180" r="55" fill="#C9A96E" opacity="0.85"/>
-  <circle cx="618" cy="168" r="47" fill="#6a0000"/>
-  <rect x="28" y="28" width="${W-56}" height="${H-56}" rx="4" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.6"/>
+  <rect width="${W}" height="${H}" fill="url(#nickGlow)"/>
+  ${moonSvg}
+  <rect x="32" y="32" width="${W-64}" height="${H-64}" rx="6" fill="none" stroke="#C9A96E" stroke-width="2" opacity="0.5"/>
+  <line x1="350" y1="260" x2="850" y2="260" stroke="#C9A96E" stroke-width="1" opacity="0.3"/>
   ${titlePath}
+  ${nickPath}
+  <line x1="350" y1="560" x2="850" y2="560" stroke="#C9A96E" stroke-width="1" opacity="0.3"/>
   ${subPath}
-  <line x1="420" y1="470" x2="780" y2="470" stroke="#C9A96E" stroke-width="1" opacity="0.3"/>
-  ${contactPath}
+  ${divider}
+  ${telPath}
+  ${brandPath}
 </svg>`;
 
   const outPath = path.join(OUT, page.file);
@@ -74,7 +103,7 @@ async function generateOG(page) {
 }
 
 async function main() {
-  console.log('Generating OG images with Noto Sans KR...');
+  console.log('Generating 1:1 OG images — 신실장 BIG...');
   for (const page of pages) {
     await generateOG(page);
   }
