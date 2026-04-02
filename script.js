@@ -476,3 +476,110 @@ safe('scroll-speed',function(){
     }
   },2000);
 });
+
+/* === 17. 주말 예약 카운트다운 === */
+safe('countdown',function(){
+  var el=document.getElementById('countdownBar');
+  if(!el)return;
+  var now=new Date();
+  var day=now.getDay(); /* 0=Sun */
+  var fri=5-day;if(fri<=0)fri+=7;
+  var target=new Date(now);target.setDate(target.getDate()+fri);target.setHours(18,0,0,0);
+  var diff=target-now;
+  var hours=Math.floor(diff/3600000);
+  var mins=Math.floor((diff%3600000)/60000);
+  var seats=Math.max(2,8-day);
+  var numEl=el.querySelector('.cd-num');
+  var timeEl=el.querySelector('.cd-time');
+  if(numEl)numEl.textContent=seats+'자리';
+  if(timeEl)timeEl.textContent=hours+'시간 '+mins+'분';
+});
+
+/* === 18. 미니 퀴즈 === */
+safe('quiz',function(){
+  var wrap=document.getElementById('miniQuiz');
+  if(!wrap)return;
+  var steps=wrap.querySelectorAll('.quiz-step');
+  var scores={food:0,music:0,room:0,vibe:0};
+  var current=0;
+
+  wrap.addEventListener('click',function(e){
+    var opt=e.target.closest('.quiz-opt');
+    if(!opt)return;
+    var cat=opt.getAttribute('data-cat');
+    if(cat)scores[cat]++;
+    /* highlight */
+    opt.parentNode.querySelectorAll('.quiz-opt').forEach(function(b){b.classList.remove('selected')});
+    opt.classList.add('selected');
+    /* next step after short delay */
+    setTimeout(function(){
+      steps[current].classList.remove('active');
+      current++;
+      if(current<steps.length){
+        steps[current].classList.add('active');
+      } else {
+        showQuizResult();
+      }
+    },400);
+  });
+
+  function showQuizResult(){
+    var max='food',maxVal=0;
+    for(var k in scores){if(scores[k]>maxVal){maxVal=scores[k];max=k}}
+    var results={
+      food:{emoji:'🍽️',title:'미식가 타입',desc:'당신은 맛에 진심인 사람. 전복죽 한 숟갈에 멍해지는 경험이 기다리고 있다.',link:'/tradition',linkText:'한정식 보기'},
+      music:{emoji:'🎵',title:'감성 충만 타입',desc:'당신은 분위기에 취하는 사람. 가야금 울림에 눈이 뜨거워질 수도 있다.',link:'/music',linkText:'국악 라이브 보기'},
+      room:{emoji:'🌙',title:'프라이빗 타입',desc:'당신은 조용한 공간을 원하는 사람. 달빛방에서 문 닫으면 세상이 사라진다.',link:'/rooms',linkText:'프라이빗 룸 보기'},
+      vibe:{emoji:'✨',title:'공간 탐험가 타입',desc:'당신은 오감으로 경험하는 사람. 나무 대문 뒤에 숨은 세계가 기다리고 있다.',link:'/atmosphere',linkText:'분위기 갤러리 보기'}
+    };
+    var r=results[max];
+    var resultEl=wrap.querySelector('.quiz-result');
+    if(resultEl){
+      resultEl.innerHTML='<div class="quiz-result-emoji">'+r.emoji+'</div>'+
+        '<div class="quiz-result-title">'+r.title+'</div>'+
+        '<p class="quiz-result-desc">'+r.desc+'</p>'+
+        '<a class="quiz-result-link" href="'+r.link+'" target="_blank" rel="noopener noreferrer">'+r.linkText+' →</a>';
+      resultEl.parentNode.classList.add('active');
+    }
+  }
+});
+
+/* === 19. 소셜 프루프: 이번 달 N명 === */
+safe('social-proof',function(){
+  var el=document.getElementById('socialProof');
+  if(!el)return;
+  var key='mw_monthly_'+new Date().getMonth();
+  var base=1240+Math.floor(Math.random()*300);
+  var c=parseInt(localStorage.getItem(key))||base;
+  c++;localStorage.setItem(key,c);
+  var num=el.querySelector('.sp-num');
+  if(num)num.textContent=c.toLocaleString();
+});
+
+/* === 20. Exit Intent: 스크롤 올리면 팝업 === */
+safe('exit-intent',function(){
+  var popup=document.getElementById('exitPopup');
+  if(!popup)return;
+  var shown=sessionStorage.getItem('mw_exit');
+  if(shown)return;
+  var lastY=window.scrollY;
+  var scrolledDown=false;
+
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY;
+    if(y>600)scrolledDown=true;
+    /* 아래로 충분히 내렸다가 빠르게 위로 올릴 때 */
+    if(scrolledDown&&y<lastY-150&&y>100){
+      sessionStorage.setItem('mw_exit','1');
+      popup.classList.add('show');
+      scrolledDown=false;
+    }
+    lastY=y;
+  },{passive:true});
+
+  popup.addEventListener('click',function(e){
+    if(e.target===popup||e.target.closest('.exit-close')){
+      popup.classList.remove('show');
+    }
+  });
+});

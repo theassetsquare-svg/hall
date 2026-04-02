@@ -263,3 +263,60 @@ footer a{color:var(--accent);text-decoration:underline}
 .ba-col.ba-before h4{color:#999}
 .ba-col.ba-after h4{color:var(--green)}
 .ba-col p{font-size:.88rem;color:var(--text);line-height:1.7;margin-bottom:6px}
+
+/* Hook opener */
+.hook-opener{font-size:1.05rem;font-weight:700;color:var(--accent);border-bottom:2px solid var(--gold);padding-bottom:14px;margin-bottom:20px}
+
+/* Countdown bar */
+.countdown-bar{background:linear-gradient(90deg,#8B0000,#b91c1c);color:#fff;padding:12px 20px;text-align:center;font-size:.88rem;font-weight:600;position:relative;overflow:hidden}
+.countdown-bar .cd-pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:8px;animation:cd-blink 1.2s infinite}
+@keyframes cd-blink{0%,100%{opacity:1}50%{opacity:.3}}
+.countdown-bar .cd-num{font-size:1.1rem;font-weight:800;color:#ffd700}
+
+/* Day/Night gallery swipe */
+.dn-gallery{margin:28px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;display:flex;gap:12px;padding:4px 0 16px;scrollbar-width:none}
+.dn-gallery::-webkit-scrollbar{display:none}
+.dn-gallery-item{min-width:260px;scroll-snap-align:start;flex-shrink:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--card);box-shadow:var(--shadow)}
+.dn-gallery-item svg{width:260px;height:180px;display:block}
+.dn-gallery-label{display:flex;justify-content:space-between;padding:10px 14px;font-size:.8rem}
+.dn-gallery-label span:first-child{color:var(--sub)}
+.dn-gallery-label span:last-child{color:var(--accent);font-weight:600}
+.dn-swipe-hint{text-align:center;font-size:.75rem;color:var(--sub);margin-top:4px}
+
+/* Mini quiz */
+.quiz-wrap{background:var(--surface);border:2px solid var(--gold);border-radius:var(--radius);padding:28px 24px;margin:32px 0}
+.quiz-wrap h3{font-size:1.1rem;font-weight:800;color:var(--accent);margin-bottom:4px}
+.quiz-sub{font-size:.85rem;color:var(--sub);margin-bottom:20px}
+.quiz-q{font-size:.95rem;font-weight:700;margin-bottom:12px;color:var(--text)}
+.quiz-q .quiz-num{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;background:var(--accent);color:#fff;border-radius:50%;font-size:.75rem;margin-right:8px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.quiz-opt{padding:14px 18px;min-height:44px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:.9rem;transition:all .2s;text-align:left;font-family:inherit;color:var(--text)}
+.quiz-opt:hover{border-color:var(--accent);background:#fff5f5}
+.quiz-opt.selected{border-color:var(--accent);background:#fff0f0;font-weight:700}
+.quiz-step{display:none}
+.quiz-step.active{display:block}
+.quiz-result{text-align:center;padding:20px 0}
+.quiz-result-emoji{font-size:2.5rem;margin-bottom:8px}
+.quiz-result-title{font-size:1.15rem;font-weight:800;color:var(--accent);margin-bottom:6px}
+.quiz-result-desc{font-size:.9rem;color:var(--sub);margin-bottom:16px;line-height:1.7}
+.quiz-result-link{display:inline-block;padding:14px 28px;min-height:44px;background:var(--accent);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:700;font-size:.95rem}
+
+/* Social proof badge */
+.social-proof{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.85rem;color:var(--sub)}
+.social-proof .sp-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:cd-blink 1.5s infinite}
+.social-proof strong{color:var(--text)}
+
+/* Exit intent popup */
+.exit-popup{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.exit-popup.show{opacity:1;pointer-events:auto}
+.exit-inner{background:#fff;border-radius:20px;padding:36px 28px;max-width:360px;width:calc(100% - 40px);text-align:center;transform:translateY(20px);transition:transform .3s}
+.exit-popup.show .exit-inner{transform:translateY(0)}
+.exit-inner h3{font-size:1.15rem;font-weight:800;color:var(--accent);margin-bottom:8px}
+.exit-inner p{font-size:.9rem;color:var(--sub);margin-bottom:20px;line-height:1.7}
+.exit-cta{display:inline-block;padding:14px 28px;min-height:44px;background:var(--accent);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:700;font-size:.95rem;margin-bottom:8px}
+.exit-close{display:block;margin:0 auto;background:none;border:none;color:var(--sub);font-size:.85rem;cursor:pointer;padding:8px;min-height:44px;font-family:inherit}
+
+/* Bottom CTA — 보라색 놀쿨 버튼 */
+.nolcool-link-big{display:block;max-width:400px;margin:0 auto;padding:18px 28px;min-height:52px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:800;font-size:1.1rem;text-align:center;box-shadow:0 4px 20px rgba(124,58,237,.3);transition:transform .15s,box-shadow .15s}
+.nolcool-link-big:active{transform:scale(.97)}
+.nolcool-link-big:hover{box-shadow:0 6px 28px rgba(124,58,237,.4)}
