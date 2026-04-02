@@ -442,6 +442,24 @@ safe('page-progress',function(){
   }
 });
 
+/* === NEW: 80% 스크롤 시크릿 공개 === */
+safe('secret-reveal',function(){
+  var box=document.getElementById('secretBox');
+  if(!box)return;
+  var revealed=false;
+  window.addEventListener('scroll',function(){
+    if(revealed)return;
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    if(h<=0)return;
+    var pct=window.scrollY/h;
+    if(pct>=0.8){
+      revealed=true;
+      box.classList.add('revealed');
+      showReward('🔑','시크릿 정보 공개!');
+    }
+  },{passive:true});
+});
+
 /* === 16. 스크롤 속도 감지 (2초 간격으로 축소, 5분 후 중지) === */
 safe('scroll-speed',function(){
   var lastY=window.scrollY,slowCount=0;
