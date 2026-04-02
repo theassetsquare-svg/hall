@@ -135,7 +135,7 @@ footer a{color:var(--accent);text-decoration:underline}
 /* Bottom space */
 .bottom-space{height:90px}
 @media(min-width:768px){
-  .fixed-call{position:static;transform:none;max-width:400px;margin:0 auto 24px;width:100%}
+  .fixed-call{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:400px;width:calc(100% - 40px)}
   .bottom-space{height:24px}
   .autonext-bar{bottom:24px}
   .spin-fab{bottom:24px}
