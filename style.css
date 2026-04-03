@@ -251,8 +251,8 @@ footer a{color:var(--accent);text-decoration:underline}
 .secret-box{background:linear-gradient(135deg,#1a1a1a,#2d1a1a);color:#fff;border-radius:var(--radius);padding:28px 24px;margin:32px 0;text-align:center;opacity:0;transform:translateY(20px);transition:all .8s ease}
 .secret-box.revealed{opacity:1;transform:translateY(0)}
 .secret-box .secret-label{font-size:.72rem;letter-spacing:.15em;color:var(--gold);margin-bottom:8px}
-.secret-box h3{font-size:1.1rem;margin-bottom:10px;color:#fff}
-.secret-box p{font-size:.9rem;color:rgba(255,255,255,.8);line-height:1.7}
+.secret-box h3{font-size:1.1rem;margin-bottom:10px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.secret-box p{font-size:.9rem;color:rgba(255,255,255,.8);line-height:1.7;text-shadow:0 1px 3px rgba(0,0,0,.4)}
 
 /* Before/After */
 .before-after{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:24px 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
