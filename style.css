@@ -320,3 +320,11 @@ footer a{color:var(--accent);text-decoration:underline}
 .nolcool-link-big{display:block;max-width:400px;margin:0 auto;padding:18px 28px;min-height:52px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:800;font-size:1.1rem;text-align:center;box-shadow:0 4px 20px rgba(124,58,237,.3);transition:transform .15s,box-shadow .15s}
 .nolcool-link-big:active{transform:scale(.97)}
 .nolcool-link-big:hover{box-shadow:0 6px 28px rgba(124,58,237,.4)}
+
+/* Pull quote — 기사 중간 대형 인용문 */
+.pull-quote{font-size:clamp(1.2rem,3vw,1.5rem);font-style:italic;font-weight:700;color:var(--accent);text-align:center;padding:28px 24px;margin:36px 0;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);line-height:1.6;letter-spacing:-.01em}
+
+/* Mid-article CTA */
+.mid-cta{display:block;max-width:400px;margin:32px auto;padding:18px 28px;min-height:52px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:800;font-size:1.05rem;text-align:center;box-shadow:0 4px 20px rgba(124,58,237,.3);transition:transform .15s,box-shadow .15s}
+.mid-cta:active{transform:scale(.97)}
+.mid-cta:hover{box-shadow:0 6px 28px rgba(124,58,237,.4)}
