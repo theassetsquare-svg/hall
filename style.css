@@ -328,3 +328,10 @@ footer a{color:var(--accent);text-decoration:underline}
 .mid-cta{display:block;max-width:400px;margin:32px auto;padding:18px 28px;min-height:52px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:800;font-size:1.05rem;text-align:center;box-shadow:0 4px 20px rgba(124,58,237,.3);transition:transform .15s,box-shadow .15s}
 .mid-cta:active{transform:scale(.97)}
 .mid-cta:hover{box-shadow:0 6px 28px rgba(124,58,237,.4)}
+
+/* Answer Capsule — AEO direct answer (AI 검색 인용 +40%) */
+.answer-capsule{background:linear-gradient(135deg,#f8f5ef,#fdfaf2);border:1px solid #e8dcc8;border-left:4px solid #8B0000;border-radius:0 8px 8px 0;padding:18px 22px;margin:24px 0;font-size:.98rem;line-height:1.75;color:#2a2218}
+.answer-capsule strong{color:#8B0000;font-weight:800}
+.answer-capsule::before{content:"답";display:inline-block;background:#8B0000;color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:3px;margin-right:10px;vertical-align:middle;letter-spacing:.05em}
+.kw-cluster{background:#faf7f0;border:1px solid #e8dcc8;border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.9rem;color:#555;line-height:1.7}
+.kw-cluster strong{color:#2a2218}
