@@ -1,43 +1,133 @@
+# 일산명월관요정 robots.txt
+# Updated: 2026-05-19
+# Primary keyword: 일산명월관요정 / 일산명월관 / 일산요정
+
 User-agent: *
 Allow: /
 
+# Google
 User-agent: Googlebot
 Allow: /
 
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Naver (한국)
 User-agent: Yeti
 Allow: /
 
 User-agent: NaverBot
 Allow: /
 
+User-agent: Yeti-Mobile
+Allow: /
+
+# Daum/Kakao (한국)
 User-agent: Daumoa
 Allow: /
 
+User-agent: Daumoa-feedfetcher
+Allow: /
+
+User-agent: Kakaotalk-scrap
+Allow: /
+
+# OpenAI (ChatGPT)
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
-User-agent: Google-Extended
+User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: PerplexityBot
-Allow: /
-
+# Anthropic (Claude)
 User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
 Allow: /
 
 User-agent: anthropic-ai
 Allow: /
 
-User-agent: CCBot
+# Perplexity
+User-agent: PerplexityBot
 Allow: /
 
+User-agent: Perplexity-User
+Allow: /
+
+# Bing / Microsoft Copilot
 User-agent: Bingbot
 Allow: /
 
-User-agent: Kakaotalk-scrap
+User-agent: BingPreview
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Meta AI
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: FacebookExternalHit
+Allow: /
+
+# Common Crawl (LLM training)
+User-agent: CCBot
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Yandex
+User-agent: YandexBot
+Allow: /
+
+# 기타 AI 크롤러
+User-agent: Diffbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: ImagesiftBot
 Allow: /
 
 Sitemap: https://hall-8i2.pages.dev/sitemap.xml
+Host: hall-8i2.pages.dev
