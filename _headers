@@ -1,0 +1,70 @@
+# Cloudflare Pages _headers — 일산명월관요정
+# 보안 헤더 + 캐시 최적화 (Core Web Vitals + SEO)
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Embedder-Policy: unsafe-none
+
+# HTML — 캐시 최소화 (콘텐츠 즉시 반영)
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large
+
+# CSS / JS — 1시간 브라우저 캐시 + CDN 영구
+/*.css
+  Cache-Control: public, max-age=3600, s-maxage=31536000, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+
+/*.js
+  Cache-Control: public, max-age=3600, s-maxage=31536000, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+
+# 이미지 — 30일 브라우저 캐시 + CDN 영구
+/*.png
+  Cache-Control: public, max-age=2592000, s-maxage=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.jpg
+  Cache-Control: public, max-age=2592000, s-maxage=31536000, immutable
+
+/*.jpeg
+  Cache-Control: public, max-age=2592000, s-maxage=31536000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=2592000, s-maxage=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.webp
+  Cache-Control: public, max-age=2592000, s-maxage=31536000, immutable
+
+/favicon.svg
+  Cache-Control: public, max-age=604800, s-maxage=31536000, immutable
+
+# SEO 파일 — 1시간 캐시 (자주 업데이트 가능)
+/robots.txt
+  Cache-Control: public, max-age=3600, s-maxage=86400
+  X-Robots-Tag: noindex
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600, s-maxage=86400
+  X-Robots-Tag: noindex
+  Content-Type: application/xml; charset=utf-8
+
+/llms.txt
+  Cache-Control: public, max-age=3600, s-maxage=86400
+  X-Robots-Tag: noindex
+  Content-Type: text/markdown; charset=utf-8
+
+# AI 봇 명시 허용 (헤더 레벨)
+/*
+  X-AI-Index: allow
