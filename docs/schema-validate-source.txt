@@ -1,0 +1,62 @@
+name: Schema.org JSON-LD 검증 — 매일 8페이지
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+
+permissions:
+  contents: read
+
+jobs:
+  schema-validate:
+    name: JSON-LD 파싱 + 검증
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all JSON-LD blocks
+        run: |
+          python3 <<'PYEOF'
+          import re, json, sys
+          pages = ["index.html","tradition/index.html","music/index.html","rooms/index.html","atmosphere/index.html","review/index.html","faq/index.html","contact/index.html"]
+          required = ['Organization','WebSite','LocalBusiness']
+          fail = 0
+          for page in pages:
+              with open(page) as f: html = f.read()
+              m = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.DOTALL)
+              if not m:
+                  print(f"::error file={page}::JSON-LD missing"); fail += 1; continue
+              try:
+                  data = json.loads(m.group(1))
+              except json.JSONDecodeError as e:
+                  print(f"::error file={page}::parse failed: {e}"); fail += 1; continue
+              graph = data.get('@graph', [])
+              flat = []
+              for item in graph:
+                  t = item.get('@type')
+                  if isinstance(t,str): flat.append(t)
+                  elif isinstance(t,list): flat.extend(t)
+              missing = [r for r in required if r not in flat]
+              if missing:
+                  print(f"::error file={page}::Missing {missing}"); fail += 1
+              else:
+                  print(f"OK {page} — {len(graph)} nodes")
+          if fail > 0:
+              print(f"::error::{fail} page(s) failed"); sys.exit(1)
+          print("OK All 8 pages")
+          PYEOF
+
+      - name: Check sitemap.xml
+        run: |
+          python3 -c "import xml.etree.ElementTree as ET; t=ET.parse('sitemap.xml'); ns={'sm':'http://www.sitemaps.org/schemas/sitemap/0.9'}; urls=t.findall('sm:url',ns); print(f'Sitemap OK — {len(urls)} URLs')"
+
+      - name: Check SEO files presence
+        run: |
+          for f in robots.txt sitemap.xml llms.txt site.webmanifest sw.js favicon.svg; do
+            test -f "$f" && echo "OK $f" || (echo "::error::$f missing" && exit 1)
+          done
