@@ -1,0 +1,86 @@
+name: 라이브 사이트 24h 헬스체크
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # 6시간마다
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    name: 8 페이지 + SEO 파일 라이브 검증
+    runs-on: ubuntu-latest
+    steps:
+      - name: HTTP 상태 검증
+        run: |
+          set +e
+          FAIL=0
+          declare -A EXPECTED=(
+            ["https://hall-8i2.pages.dev/"]=200
+            ["https://hall-8i2.pages.dev/tradition/"]=200
+            ["https://hall-8i2.pages.dev/music/"]=200
+            ["https://hall-8i2.pages.dev/rooms/"]=200
+            ["https://hall-8i2.pages.dev/atmosphere/"]=200
+            ["https://hall-8i2.pages.dev/review/"]=200
+            ["https://hall-8i2.pages.dev/faq/"]=200
+            ["https://hall-8i2.pages.dev/contact/"]=200
+            ["https://hall-8i2.pages.dev/robots.txt"]=200
+            ["https://hall-8i2.pages.dev/sitemap.xml"]=200
+            ["https://hall-8i2.pages.dev/llms.txt"]=200
+            ["https://hall-8i2.pages.dev/site.webmanifest"]=200
+            ["https://hall-8i2.pages.dev/sw.js"]=200
+            ["https://hall-8i2.pages.dev/favicon.svg"]=200
+            ["https://hall-8i2.pages.dev/og-image.png"]=200
+          )
+
+          for url in "${!EXPECTED[@]}"; do
+            expected="${EXPECTED[$url]}"
+            actual=$(curl -s -o /dev/null -w "%{http_code}" -L "$url")
+            if [ "$actual" = "$expected" ]; then
+              echo "✅ $url → $actual"
+            else
+              echo "::error::$url → expected $expected, got $actual"
+              FAIL=$((FAIL+1))
+            fi
+          done
+
+          if [ $FAIL -gt 0 ]; then
+            echo "::error::$FAIL endpoint(s) failed"
+            exit 1
+          fi
+
+      - name: HTML 핵심 메타 검증
+        run: |
+          set +e
+          FAIL=0
+          PAGES=("https://hall-8i2.pages.dev/" "https://hall-8i2.pages.dev/tradition/" "https://hall-8i2.pages.dev/music/" "https://hall-8i2.pages.dev/rooms/" "https://hall-8i2.pages.dev/atmosphere/" "https://hall-8i2.pages.dev/review/" "https://hall-8i2.pages.dev/faq/" "https://hall-8i2.pages.dev/contact/")
+
+          for url in "${PAGES[@]}"; do
+            html=$(curl -sL "$url")
+
+            for required in "<title>" "name=\"description\"" "rel=\"canonical\"" "application/ld+json" "og:image" "rel=\"manifest\"" "skip-to-main"; do
+              if echo "$html" | grep -q "$required"; then
+                echo "  ✅ $url has $required"
+              else
+                echo "::error::$url missing $required"
+                FAIL=$((FAIL+1))
+              fi
+            done
+          done
+
+          if [ $FAIL -gt 0 ]; then exit 1; fi
+          echo "✅ All pages have required meta + schema"
+
+      - name: Schema.org 라이브 검증
+        run: |
+          for url in https://hall-8i2.pages.dev/ https://hall-8i2.pages.dev/faq/ https://hall-8i2.pages.dev/review/; do
+            count=$(curl -sL "$url" | grep -c "application/ld+json")
+            echo "$url → $count JSON-LD blocks"
+            if [ "$count" -lt 1 ]; then
+              echo "::error::$url missing JSON-LD!"
+              exit 1
+            fi
+          done
