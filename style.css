@@ -53,8 +53,8 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',sans-seri
 .page-header p{color:var(--sub);font-size:.95rem}
 .h1-brand{display:block;font-size:.45em;font-weight:400;color:var(--sub);margin-top:4px;letter-spacing:0}
 
-/* Section */
-section{padding:40px 0}
+/* Section — content-visibility로 오프스크린 렌더 차단 (LCP/INP +) */
+section{padding:40px 0;content-visibility:auto;contain-intrinsic-size:auto 800px}
 .section-label{font-size:.78rem;color:var(--accent);font-weight:700;letter-spacing:.08em;margin-bottom:14px}
 
 /* Cards */
@@ -335,3 +335,131 @@ footer a{color:var(--accent);text-decoration:underline}
 .answer-capsule::before{content:"답";display:inline-block;background:#8B0000;color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:3px;margin-right:10px;vertical-align:middle;letter-spacing:.05em}
 .kw-cluster{background:#faf7f0;border:1px solid #e8dcc8;border-radius:8px;padding:14px 18px;margin:20px 0;font-size:.9rem;color:#555;line-height:1.7}
 .kw-cluster strong{color:#2a2218}
+
+/* ============================================
+   ★ A11y + UX 2026-05-21 ★
+   ============================================ */
+
+/* Skip-to-main link (스크린리더·키보드 사용자) */
+.skip-to-main{position:absolute;top:-100px;left:8px;z-index:10001;padding:12px 18px;background:#111;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.9rem;transition:top .15s}
+.skip-to-main:focus{top:8px;outline:3px solid var(--gold);outline-offset:2px}
+
+/* Focus-visible — 키보드 사용자만 보이는 강한 포커스 링 */
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+button:focus-visible,a:focus-visible,.faq-q:focus-visible,.quiz-opt:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* Reduced motion — 어지러움 호소 사용자 보호 */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  html{scroll-behavior:auto}
+  .secret-box,.sr-hidden{opacity:1;transform:none}
+}
+
+/* Prefers-color-scheme: dark (시스템 다크모드 자동 대응) */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f0d0a;
+    --surface:#1a1612;
+    --card:#1f1a15;
+    --text:#f4ede0;
+    --sub:#b3a795;
+    --accent:#e85a4f;
+    --gold:#d4b375;
+    --border:#2d2620;
+    --shadow:0 2px 12px rgba(0,0,0,.4);
+    --hover-shadow:0 6px 24px rgba(0,0,0,.6);
+  }
+  body{background:var(--bg);color:var(--text)}
+  .nav{background:rgba(15,13,10,.92);border-bottom-color:var(--border)}
+  .nav-menu{background:rgba(15,13,10,.98)}
+  .answer-capsule{background:linear-gradient(135deg,#1f1a14,#251f17);border-left-color:var(--accent);color:var(--text)}
+  .answer-capsule strong{color:var(--accent)}
+  .insider-tip{background:linear-gradient(135deg,#1f1810,#251e15);border-color:var(--gold);color:var(--text)}
+  .insider-tip p{color:var(--text)}
+  .review-highlight{background:var(--card);border-color:var(--border)}
+  .compare-table tr:nth-child(even){background:rgba(255,255,255,.03)}
+  .compare-table td{border-bottom-color:var(--border)}
+  .ba-col.ba-before{background:#1f1a17}
+  .ba-col.ba-after{background:#17221a}
+  .ba-col p{color:var(--text)}
+  .quiz-opt{background:var(--card);color:var(--text)}
+  .quiz-opt:hover{background:#2a1f1a}
+  .quiz-opt.selected{background:#2a1f1a}
+  .exit-inner{background:var(--card)}
+  .nolcool-link-big,.mid-cta{background:linear-gradient(135deg,#9d4dff,#7c3aed)}
+  .illust-block,.kw-cluster{background:var(--surface);border-color:var(--border)}
+}
+
+/* Print stylesheet (인쇄 시 SEO 콘텐츠만) */
+@media print{
+  .nav,.fixed-call,.countdown-bar,.social-proof,.exit-popup,.spin-fab,.autonext-bar,.bottom-space,.time-badge,.reward-popup,.live-toast,.explore-tracker{display:none!important}
+  body{font-size:11pt;line-height:1.5;color:#000;background:#fff}
+  a{color:#000;text-decoration:underline}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}
+  .answer-capsule,.insider-tip,.review-highlight{break-inside:avoid;page-break-inside:avoid}
+  .hero,.page-header{padding:20px 0;border:none}
+  .hero h1,.page-header h1{font-size:18pt}
+}
+
+/* High contrast (시각 약자 보호) */
+@media (prefers-contrast: more){
+  :root{--border:#000;--sub:#000}
+  .card,.review-highlight,.faq-item{border-width:2px}
+  a{text-decoration:underline}
+}
+
+/* Image performance — CLS 방지용 기본 ratio */
+img{max-width:100%;height:auto}
+svg{max-width:100%;height:auto}
+
+/* PC large screen — 2026 트렌드 wide-hero */
+@media(min-width:1024px){
+  .wrap{max-width:880px}
+  .hero{padding:80px 20px 60px}
+  .hero h1{font-size:clamp(2rem,3.5vw,2.6rem)}
+  .page-header{padding:72px 20px 48px}
+  .story p{font-size:1.06rem;line-height:1.85}
+  .card-grid{grid-template-columns:repeat(3,1fr)}
+  .pull-quote{font-size:clamp(1.4rem,2vw,1.8rem);margin:48px 0}
+}
+
+/* Sticky CTA — PC 우측 하단 미니 다이얼러 */
+@media(min-width:1024px){
+  .fixed-call{left:auto;right:24px;bottom:24px;transform:none;max-width:280px}
+}
+
+/* Selection color */
+::selection{background:var(--accent);color:#fff}
+::-moz-selection{background:var(--accent);color:#fff}
+
+/* Caret color */
+input,textarea{caret-color:var(--accent)}
+
+/* View Transition API — 브라우저 네이티브 페이지 전환 (Chrome 111+) */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:fade-out .25s ease}
+::view-transition-new(root){animation:fade-in .25s ease}
+@keyframes fade-out{to{opacity:0}}
+@keyframes fade-in{from{opacity:0}}
+
+/* Back-to-top floating button */
+.back-to-top{position:fixed;right:16px;bottom:96px;width:44px;height:44px;border-radius:50%;background:rgba(17,17,17,.85);color:#fff;border:none;font-size:1.3rem;cursor:pointer;z-index:97;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s,transform .15s;display:flex;align-items:center;justify-content:center;font-weight:300;line-height:1}
+.back-to-top.show{opacity:1;pointer-events:auto}
+.back-to-top:active{transform:scale(.92)}
+@media(min-width:1024px){.back-to-top{right:24px;bottom:88px;width:48px;height:48px}}
+
+/* Smooth tap feedback (mobile) */
+a,button{-webkit-tap-highlight-color:transparent}
+a:active,button:active,.card:active{transform:translateY(1px)}
+@media(prefers-reduced-motion: reduce){a:active,button:active,.card:active{transform:none}}
+
+/* CLS protection — svg ratio lock */
+.illust-block svg,.gallery-item svg,.dn-gallery-item svg{aspect-ratio:attr(viewBox)}
+
+/* Hover-only effects (touchscreens skip) */
+@media(hover:hover) and (pointer:fine){
+  .card:hover{transform:translateY(-4px);box-shadow:var(--hover-shadow)}
+  .nav-menu a:hover{transform:translateX(2px)}
+}
+
+

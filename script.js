@@ -583,3 +583,48 @@ safe('exit-intent',function(){
     }
   });
 });
+
+/* --- Back-to-top floating button (자동 주입) --- */
+safe('back-to-top',function(){
+  var btn=document.createElement('button');
+  btn.className='back-to-top';
+  btn.setAttribute('aria-label','맨 위로');
+  btn.innerHTML='&#8593;';
+  btn.addEventListener('click',function(){
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+  document.body.appendChild(btn);
+
+  var threshold=600;
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>threshold){
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  },{passive:true});
+});
+
+/* --- PWA Service Worker (오프라인 + 캐시) --- */
+safe('sw-register',function(){
+  if('serviceWorker' in navigator && location.protocol === 'https:'){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(err){
+        console.warn('SW register fail:',err);
+      });
+    });
+  }
+});
+
+
+/* --- PWA Service Worker 등록 (오프라인 + 캐시) --- */
+safe('sw-register',function(){
+  if('serviceWorker' in navigator && location.protocol === 'https:'){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(err){
+        console.warn('SW register fail:',err);
+      });
+    });
+  }
+});
+

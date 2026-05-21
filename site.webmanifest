@@ -1,0 +1,62 @@
+{
+  "name": "일산명월관요정",
+  "short_name": "명월관",
+  "description": "경기도 고양시 일산에 위치한 30년 전통 한정식 요정. 가야금 라이브와 프라이빗 룸 30개.",
+  "lang": "ko-KR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#8B0000",
+  "categories": ["food", "lifestyle", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/og-image.png",
+      "type": "image/png",
+      "sizes": "1200x1200",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "신실장에게 전화",
+      "short_name": "전화",
+      "description": "010-3695-4929 신실장 직통 전화",
+      "url": "tel:010-3695-4929",
+      "icons": [{ "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }]
+    },
+    {
+      "name": "카카오톡 상담",
+      "short_name": "카톡",
+      "description": "카카오톡으로 예약 문의",
+      "url": "https://open.kakao.com/o/besta12",
+      "icons": [{ "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }]
+    },
+    {
+      "name": "예약 안내",
+      "short_name": "예약",
+      "description": "예약 절차 안내",
+      "url": "/contact/",
+      "icons": [{ "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "type": "image/png",
+      "sizes": "1200x1200",
+      "form_factor": "wide",
+      "label": "일산명월관요정 메인"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
