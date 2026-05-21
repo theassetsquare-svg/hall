@@ -1,0 +1,68 @@
+name: Lighthouse CI — 매일 8페이지 점수 추적
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # 매일 03:30 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - 'style.css'
+      - 'script.js'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lighthouse:
+    name: Lighthouse 8페이지 측정
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+
+      - name: Run Lighthouse on 8 pages
+        env:
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+        run: |
+          mkdir -p .lighthouseci
+          URLS=(
+            "https://hall-8i2.pages.dev/"
+            "https://hall-8i2.pages.dev/tradition/"
+            "https://hall-8i2.pages.dev/music/"
+            "https://hall-8i2.pages.dev/rooms/"
+            "https://hall-8i2.pages.dev/atmosphere/"
+            "https://hall-8i2.pages.dev/review/"
+            "https://hall-8i2.pages.dev/faq/"
+            "https://hall-8i2.pages.dev/contact/"
+          )
+
+          for url in "${URLS[@]}"; do
+            slug=$(echo "$url" | sed 's|https://hall-8i2.pages.dev/||; s|/||g; s|^$|home|')
+            echo "=== Running Lighthouse on $url (slug=$slug) ==="
+            lhci collect --url="$url" --numberOfRuns=1 --settings.preset=desktop || true
+            lhci collect --url="$url" --numberOfRuns=1 || true
+          done
+
+      - name: Generate Lighthouse report summary
+        run: |
+          echo "# Lighthouse Score Report $(date -u +%Y-%m-%d)" > .lighthouseci/SUMMARY.md
+          echo "Generated automatically." >> .lighthouseci/SUMMARY.md
+          ls -la .lighthouseci/ || true
+
+      - name: Upload Lighthouse artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results-${{ github.run_id }}
+          path: .lighthouseci/
+          retention-days: 30
