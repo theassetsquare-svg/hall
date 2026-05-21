@@ -1,0 +1,104 @@
+name: Schema.org JSON-LD 검증 — 매일 8페이지
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 매일 04:00 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  schema-validate:
+    name: JSON-LD 파싱 + 검증
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all JSON-LD blocks
+        run: |
+          set +e
+          FAIL=0
+          PAGES=(
+            "index.html"
+            "tradition/index.html"
+            "music/index.html"
+            "rooms/index.html"
+            "atmosphere/index.html"
+            "review/index.html"
+            "faq/index.html"
+            "contact/index.html"
+          )
+
+          for page in "${PAGES[@]}"; do
+            echo "::group::Validating $page"
+            JSON=$(grep -oP '(?<=<script type="application/ld\+json">).*?(?=</script>)' "$page" | head -1)
+            if [ -z "$JSON" ]; then
+              echo "::error file=$page::JSON-LD block missing!"
+              FAIL=$((FAIL+1))
+              continue
+            fi
+            echo "$JSON" | python3 -c "import json,sys; json.loads(sys.stdin.read()); print('✅ Valid JSON')" || {
+              echo "::error file=$page::JSON-LD parse failed!"
+              FAIL=$((FAIL+1))
+            }
+
+            # Check required fields
+            echo "$JSON" | python3 -c "
+import json,sys
+data=json.loads(sys.stdin.read())
+graph=data.get('@graph',[])
+types=[item.get('@type') for item in graph]
+print(f'  Types found: {types}')
+required_any=['Organization','WebSite','LocalBusiness','WebPage']
+flat=[t if isinstance(t,str) else (t[0] if t else '') for t in types]
+flat_strs=[]
+for t in types:
+    if isinstance(t,str): flat_strs.append(t)
+    elif isinstance(t,list): flat_strs.extend(t)
+missing=[r for r in required_any if r not in flat_strs]
+if missing:
+    print(f'  ⚠️  Missing recommended types: {missing}')
+    sys.exit(1)
+else:
+    print('  ✅ All required types present')
+"
+            echo "::endgroup::"
+          done
+
+          if [ $FAIL -gt 0 ]; then
+            echo "::error::$FAIL page(s) failed schema validation"
+            exit 1
+          fi
+          echo "✅ All 8 pages passed schema validation"
+
+      - name: Check sitemap.xml
+        run: |
+          python3 -c "
+import xml.etree.ElementTree as ET
+tree = ET.parse('sitemap.xml')
+ns = {'sm':'http://www.sitemaps.org/schemas/sitemap/0.9'}
+urls = tree.findall('sm:url', ns)
+print(f'✅ Sitemap has {len(urls)} URLs')
+for url in urls:
+    loc = url.find('sm:loc', ns).text
+    lastmod = url.find('sm:lastmod', ns).text
+    print(f'  {loc} → {lastmod}')
+"
+
+      - name: Check robots.txt + llms.txt presence
+        run: |
+          for f in robots.txt sitemap.xml llms.txt site.webmanifest sw.js favicon.svg; do
+            if [ -f "$f" ]; then
+              size=$(wc -c < "$f")
+              echo "✅ $f exists ($size bytes)"
+            else
+              echo "::error::$f missing!"
+              exit 1
+            fi
+          done
