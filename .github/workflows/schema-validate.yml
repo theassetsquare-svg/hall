@@ -1,110 +1,62 @@
 name: Schema.org JSON-LD 검증 — 매일 8페이지
 
-  on:
-    schedule:
-      - cron: '0 4 * * *'   # 매일 04:00 UTC
-    workflow_dispatch:
-    push:
-      branches: [main]
-      paths:
-        - '**/*.html'
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
 
-  permissions:
-    contents: read
-    issues: write
+permissions:
+  contents: read
 
-  jobs:
-    schema-validate:
-      name: JSON-LD 파싱 + 검증
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
+jobs:
+  schema-validate:
+    name: JSON-LD 파싱 + 검증
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Validate all JSON-LD blocks (Python multiline-safe)
-          run: |
-            python3 << 'PYEOF'
-            import re, json, sys
-            pages = [
-                "index.html",
-                "tradition/index.html",
-                "music/index.html",
-                "rooms/index.html",
-                "atmosphere/index.html",
-                "review/index.html",
-                "faq/index.html",
-                "contact/index.html",
-            ]
-            required_any = ['Organization', 'WebSite', 'LocalBusiness']
-            fail = 0
-            for page in pages:
-                print(f"::group::Validating {page}")
-                try:
-                    with open(page) as f:
-                        html = f.read()
-                except FileNotFoundError:
-                    print(f"::error file={page}::File not found")
-                    fail += 1
-                    continue
+      - name: Validate all JSON-LD blocks
+        run: |
+          python3 <<'PYEOF'
+          import re, json, sys
+          pages = ["index.html","tradition/index.html","music/index.html","rooms/index.html","atmosphere/index.html","review/index.html","faq/index.html","contact/index.html"]
+          required = ['Organization','WebSite','LocalBusiness']
+          fail = 0
+          for page in pages:
+              with open(page) as f: html = f.read()
+              m = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.DOTALL)
+              if not m:
+                  print(f"::error file={page}::JSON-LD missing"); fail += 1; continue
+              try:
+                  data = json.loads(m.group(1))
+              except json.JSONDecodeError as e:
+                  print(f"::error file={page}::parse failed: {e}"); fail += 1; continue
+              graph = data.get('@graph', [])
+              flat = []
+              for item in graph:
+                  t = item.get('@type')
+                  if isinstance(t,str): flat.append(t)
+                  elif isinstance(t,list): flat.extend(t)
+              missing = [r for r in required if r not in flat]
+              if missing:
+                  print(f"::error file={page}::Missing {missing}"); fail += 1
+              else:
+                  print(f"OK {page} — {len(graph)} nodes")
+          if fail > 0:
+              print(f"::error::{fail} page(s) failed"); sys.exit(1)
+          print("OK All 8 pages")
+          PYEOF
 
-                m = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.DOTALL)
-                if not m:
-                    print(f"::error file={page}::JSON-LD block missing")
-                    fail += 1
-                    continue
+      - name: Check sitemap.xml
+        run: |
+          python3 -c "import xml.etree.ElementTree as ET; t=ET.parse('sitemap.xml'); ns={'sm':'http://www.sitemaps.org/schemas/sitemap/0.9'}; urls=t.findall('sm:url',ns); print(f'Sitemap OK — {len(urls)} URLs')"
 
-                try:
-                    data = json.loads(m.group(1))
-                except json.JSONDecodeError as e:
-                    print(f"::error file={page}::JSON parse failed: {e}")
-                    fail += 1
-                    continue
-
-                graph = data.get('@graph', [])
-                flat_types = []
-                for item in graph:
-                    t = item.get('@type')
-                    if isinstance(t, str):
-                        flat_types.append(t)
-                    elif isinstance(t, list):
-                        flat_types.extend(t)
-
-                missing = [r for r in required_any if r not in flat_types]
-                if missing:
-                    print(f"::error file={page}::Missing required types: {missing}")
-                    fail += 1
-                else:
-                    print(f"  ✅ {page} — {len(graph)} nodes, types: {set(flat_types)}")
-
-                print("::endgroup::")
-
-            if fail > 0:
-                print(f"::error::{fail} page(s) failed schema validation")
-                sys.exit(1)
-            print("✅ All 8 pages passed schema validation")
-            PYEOF
-
-        - name: Check sitemap.xml
-          run: |
-            python3 -c "
-            import xml.etree.ElementTree as ET
-            tree = ET.parse('sitemap.xml')
-            ns = {'sm':'http://www.sitemaps.org/schemas/sitemap/0.9'}
-            urls = tree.findall('sm:url', ns)
-            print(f'✅ Sitemap has {len(urls)} URLs')
-            for url in urls:
-                loc = url.find('sm:loc', ns).text
-                lastmod = url.find('sm:lastmod', ns).text
-                print(f'  {loc} → {lastmod}')
-            "
-
-        - name: Check robots.txt + llms.txt presence
-          run: |
-            for f in robots.txt sitemap.xml llms.txt site.webmanifest sw.js favicon.svg; do
-              if [ -f "$f" ]; then
-                size=$(wc -c < "$f")
-                echo "✅ $f exists ($size bytes)"
-              else
-                echo "::error::$f missing!"
-                exit 1
-              fi
-            done
+      - name: Check SEO files presence
+        run: |
+          for f in robots.txt sitemap.xml llms.txt site.webmanifest sw.js favicon.svg; do
+            test -f "$f" && echo "OK $f" || (echo "::error::$f missing" && exit 1)
+          done
