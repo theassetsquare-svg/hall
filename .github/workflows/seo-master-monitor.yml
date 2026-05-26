@@ -1,0 +1,118 @@
+name: SEO Master Monitor (24h Dashboard)
+
+# 24시간 종합 SEO 마스터 대시보드
+# 매일 04:00 UTC (13:00 KST) — 라이브 사이트 + 로컬 파일 통합 검사
+# 결과를 GitHub Actions Summary에 마크다운 대시보드로 출력
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  master-monitor:
+    name: 24h SEO 종합 대시보드
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 라이브 사이트 8페이지 검증
+        run: |
+          python3 <<'PY'
+          import urllib.request, re, os
+          from pathlib import Path
+
+          BASE = 'https://hall-8i2.pages.dev'
+          PATHS = ['/', '/tradition/', '/music/', '/rooms/', '/atmosphere/', '/review/', '/faq/', '/contact/']
+
+          def fetch(url, timeout=15):
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent':'SEO-Monitor/1.0'})
+                  with urllib.request.urlopen(req, timeout=timeout) as r:
+                      return r.status, r.read().decode('utf-8', errors='replace')
+              except Exception as e:
+                  return None, str(e)
+
+          rows = ['| URL | Status | Title (글자수) | Description (글자수) | Canonical |',
+                  '|-----|--------|----------------|----------------------|-----------|']
+          ok = 0
+          for path in PATHS:
+              url = BASE + path
+              status, body = fetch(url)
+              if status == 200:
+                  ok += 1
+                  title = re.search(r'<title>([^<]+)</title>', body)
+                  desc = re.search(r'name="description"\s+content="([^"]+)"', body)
+                  canon = re.search(r'<link rel="canonical" href="([^"]+)"', body)
+                  t = title.group(1) if title else '없음'
+                  d = desc.group(1) if desc else '없음'
+                  c = canon.group(1) if canon else '없음'
+                  rows.append(f'| {path} | ✅ {status} | {t[:30]} ({len(t)}) | {d[:40]}... ({len(d)}) | {c[-30:] if c!="없음" else "❌"} |')
+              else:
+                  rows.append(f'| {path} | ❌ {status} | - | - | - |')
+
+          summary = os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary:
+              with open(summary, 'w', encoding='utf-8') as f:
+                  f.write('# 🌐 일산명월관요정 24h SEO 마스터 대시보드\n\n')
+                  f.write(f'**검사 대상**: {BASE}\n\n')
+                  f.write(f'**페이지 상태**: {ok}/{len(PATHS)} OK\n\n')
+                  f.write('## 라이브 페이지 점검\n\n')
+                  f.write('\n'.join(rows) + '\n')
+          print('\n'.join(rows))
+          PY
+
+      - name: 키워드 밀도 + SEO 메타 통합 리포트
+        run: |
+          python3 <<'PY'
+          import re, os
+          from pathlib import Path
+
+          PAGES = ['index.html','atmosphere/index.html','contact/index.html','faq/index.html',
+                   'music/index.html','review/index.html','rooms/index.html','tradition/index.html']
+          PATTERN = re.compile(r'일산명월관요정|일산명월관|일산요정|명월관|한정식')
+
+          def extract(html):
+              html = re.sub(r'<script[^>]*>.*?</script>', ' ', html, flags=re.S)
+              html = re.sub(r'<style[^>]*>.*?</style>', ' ', html, flags=re.S)
+              text = re.sub(r'<[^>]+>', ' ', html)
+              return re.sub(r'\s+', ' ', text).strip()
+
+          rows = ['| 페이지 | 본문(자) | 키워드 밀도 | 일산요정 | 일산명월관 | 한정식 |',
+                  '|--------|----------|-------------|----------|------------|--------|']
+          for p in PAGES:
+              text = extract(Path(p).read_text(encoding='utf-8'))
+              total = len(text)
+              matches = PATTERN.findall(text)
+              used = sum(len(m) for m in matches)
+              density = used/total*100 if total else 0
+              status = '✅' if 1.5<=density<=2.5 else '⚠️'
+              # 개별 카운트 (longest match first via regex)
+              yo = text.count('일산요정')
+              mw = text.count('일산명월관')
+              hj = text.count('한정식')
+              rows.append(f'| `{p}` | {total} | {status} {density:.2f}% | {yo} | {mw} | {hj} |')
+
+          summary = os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary:
+              with open(summary, 'a', encoding='utf-8') as f:
+                  f.write('\n## 키워드 밀도 (목표: 1.5-2.5%)\n\n')
+                  f.write('\n'.join(rows) + '\n')
+                  f.write('\n## 자동화 상태\n\n')
+                  f.write('- `seo-daily-cron.yml`: sitemap lastmod + dateModified 매일 갱신 (03:00 UTC)\n')
+                  f.write('- `keyword-density-guard.yml`: 1.5-2.5% 가드 + PR 게이트 (03:30 UTC)\n')
+                  f.write('- `seo-regression-guard.yml`: title/meta/canonical 회귀 (03:45 UTC)\n')
+                  f.write('- `seo-master-monitor.yml`: 종합 대시보드 (04:00 UTC) — 본 워크플로\n')
+                  f.write('- `lighthouse-ci.yml`: Lighthouse 성능/SEO/A11y\n')
+                  f.write('- `live-health-check.yml`: 라이브 사이트 헬스 체크\n')
+                  f.write('- `schema-validate.yml`: JSON-LD 스키마 검증\n')
+          print('\n'.join(rows))
+          PY

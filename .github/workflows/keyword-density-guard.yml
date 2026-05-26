@@ -1,0 +1,107 @@
+name: Keyword Density Guard (24h)
+
+# 8페이지 키워드 밀도를 1.5-2.5% 범위로 자동 감시
+# - PR 게이트: 범위 벗어나면 fail
+# - 매일 03:30 UTC (12:30 KST): 회귀 검사
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+  pull_request:
+    paths:
+      - '**/*.html'
+  schedule:
+    # 매일 03:30 UTC = 한국 12:30
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  keyword-density:
+    name: 키워드 밀도 1.5-2.5% 검증
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 키워드 밀도 측정 + 게이트
+        id: density
+        run: |
+          python3 <<'PY'
+          import re, sys, os, json
+          from pathlib import Path
+
+          PAGES = [
+              'index.html',
+              'atmosphere/index.html',
+              'contact/index.html',
+              'faq/index.html',
+              'music/index.html',
+              'review/index.html',
+              'rooms/index.html',
+              'tradition/index.html',
+          ]
+          # 가장 긴 키워드부터 매칭 (중복 카운트 방지)
+          PATTERN = re.compile(r'일산명월관요정|일산명월관|일산요정|명월관|한정식')
+          MIN, MAX = 1.5, 2.5
+
+          def extract(html):
+              html = re.sub(r'<script[^>]*>.*?</script>', ' ', html, flags=re.S)
+              html = re.sub(r'<style[^>]*>.*?</style>', ' ', html, flags=re.S)
+              text = re.sub(r'<[^>]+>', ' ', html)
+              return re.sub(r'\s+', ' ', text).strip()
+
+          fail = []
+          rows = []
+          for p in PAGES:
+              if not Path(p).exists():
+                  rows.append(f'❌ {p}: 파일 없음')
+                  fail.append(p)
+                  continue
+              text = extract(Path(p).read_text(encoding='utf-8'))
+              total = len(text)
+              matches = PATTERN.findall(text)
+              used = sum(len(m) for m in matches)
+              density = used / total * 100 if total else 0
+              status = '✅' if MIN <= density <= MAX else '⚠️'
+              # 일산요정 단독 카운트
+              ilsanyojeong = text.count('일산요정')
+              rows.append(f'{status} {p}: density={density:.2f}% (matches={len(matches)}, chars={total}, 일산요정={ilsanyojeong})')
+              if not (MIN <= density <= MAX):
+                  fail.append(p)
+
+          report = '\n'.join(rows)
+          print(report)
+          # GitHub Actions summary
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('## 키워드 밀도 가드 결과\n\n')
+              f.write(f'기준: {MIN}% ≤ density ≤ {MAX}%\n\n')
+              f.write('```\n' + report + '\n```\n')
+          if fail:
+              print(f'\n❌ FAIL: {len(fail)}개 페이지가 범위를 벗어남')
+              sys.exit(1)
+          print('\n✅ ALL PASS')
+          PY
+
+      - name: 실패 시 이슈 생성 (스케줄 트리거만)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 키워드 밀도 회귀 (${today})`,
+              body: `매일 03:30 UTC 자동 검사에서 키워드 밀도가 1.5-2.5% 범위를 벗어났습니다.\n\n[워크플로 결과 확인](${context.payload.repository.html_url}/actions/runs/${context.runId})\n\n빠른 수정 필요.`,
+              labels: ['seo', 'keyword-density', 'automation']
+            });

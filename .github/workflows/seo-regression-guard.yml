@@ -1,0 +1,138 @@
+name: SEO Regression Guard (24h)
+
+# 8페이지 SEO 메타 회귀 자동 감지
+# - title 중복 검사
+# - meta description 중복 검사
+# - title/desc 길이 (10-60자 / 80-160자)
+# - canonical 존재 확인
+# - og:image 1200x1200 확인
+# - viewport-fit=cover 확인
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+  pull_request:
+    paths:
+      - '**/*.html'
+  schedule:
+    # 매일 03:45 UTC = 한국 12:45
+    - cron: '45 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  seo-regression:
+    name: SEO 회귀 (title·meta·canonical·og)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: SEO 회귀 검사
+        run: |
+          python3 <<'PY'
+          import re, sys, os
+          from pathlib import Path
+          from collections import Counter
+
+          PAGES = [
+              'index.html',
+              'atmosphere/index.html',
+              'contact/index.html',
+              'faq/index.html',
+              'music/index.html',
+              'review/index.html',
+              'rooms/index.html',
+              'tradition/index.html',
+          ]
+
+          def get(html, pattern):
+              m = re.search(pattern, html)
+              return m.group(1) if m else None
+
+          titles, descs = [], []
+          errors = []
+
+          for p in PAGES:
+              if not Path(p).exists():
+                  errors.append(f'{p}: 파일 없음')
+                  continue
+              html = Path(p).read_text(encoding='utf-8')
+              title = get(html, r'<title>([^<]+)</title>')
+              desc = get(html, r'<meta name="description" content="([^"]+)"')
+              canonical = get(html, r'<link rel="canonical" href="([^"]+)"')
+              og_w = get(html, r'<meta property="og:image:width" content="([^"]+)"')
+              og_h = get(html, r'<meta property="og:image:height" content="([^"]+)"')
+              vf = 'viewport-fit=cover' in html
+
+              if not title:
+                  errors.append(f'{p}: title 없음')
+              else:
+                  titles.append((p, title))
+                  if not (10 <= len(title) <= 60):
+                      errors.append(f'{p}: title 길이 {len(title)}자 (10-60자 권장)')
+              if not desc:
+                  errors.append(f'{p}: description 없음')
+              else:
+                  descs.append((p, desc))
+                  if not (80 <= len(desc) <= 160):
+                      errors.append(f'{p}: description 길이 {len(desc)}자 (80-160자 권장)')
+              if not canonical:
+                  errors.append(f'{p}: canonical 없음')
+              if og_w != '1200' or og_h != '1200':
+                  errors.append(f'{p}: og:image 1:1 ({og_w}x{og_h}) 권장 1200x1200')
+              if not vf:
+                  errors.append(f'{p}: viewport-fit=cover 누락')
+
+          # 중복 검사
+          dup_titles = [t for t,c in Counter(t for _,t in titles).items() if c > 1]
+          dup_descs = [d for d,c in Counter(d for _,d in descs).items() if c > 1]
+          for t in dup_titles:
+              errors.append(f'중복 title: "{t}" 사용 페이지: ' + ', '.join(p for p,tt in titles if tt==t))
+          for d in dup_descs:
+              errors.append(f'중복 description: "{d[:50]}..." 사용 페이지: ' + ', '.join(p for p,dd in descs if dd==d))
+
+          # Report
+          summary_path = os.environ.get('GITHUB_STEP_SUMMARY')
+          report = [f'### SEO 회귀 검사 — {len(PAGES)}페이지']
+          for p, t in titles:
+              report.append(f'- `{p}` title({len(t)}자): {t}')
+          report.append('')
+          for p, d in descs:
+              report.append(f'- `{p}` desc({len(d)}자): {d[:80]}...')
+          if errors:
+              report.append('\n### ❌ 오류')
+              for e in errors:
+                  report.append(f'- {e}')
+          else:
+              report.append('\n### ✅ 통과')
+          if summary_path:
+              Path(summary_path).write_text('\n'.join(report), encoding='utf-8')
+          print('\n'.join(report))
+
+          if errors:
+              sys.exit(1)
+          PY
+
+      - name: 실패 시 이슈 생성 (스케줄 트리거만)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 SEO 회귀 감지 (${today})`,
+              body: `매일 03:45 UTC 자동 검사에서 SEO 메타 회귀가 감지되었습니다.\n\n[워크플로 결과 확인](${context.payload.repository.html_url}/actions/runs/${context.runId})\n\n빠른 수정 필요.`,
+              labels: ['seo', 'regression', 'automation']
+            });
