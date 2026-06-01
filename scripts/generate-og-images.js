@@ -44,7 +44,7 @@ async function generateOG(page) {
   const subPath = textToPath(fontReg, page.sub, 28, 600, 680, '#E8D5B7');
 
   /* 전화번호 (24px) */
-  const telPath = textToPath(fontReg, '', 24, 600, 780, 'rgba(232,213,183,0.7)');
+  const telPath = textToPath(fontReg, '010-3695-4929', 24, 600, 780, 'rgba(232,213,183,0.7)');
 
   /* 밤의 달 아이콘 */
   const moonSvg = `
