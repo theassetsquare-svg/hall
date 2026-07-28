@@ -1,62 +1,74 @@
 [
   {
     "name": "parasol-green",
-    "dim": "800x1200",
-    "kb": "29.2"
+    "w": 800,
+    "h": 1200,
+    "kb": 29.2
   },
   {
     "name": "white-hanok",
-    "dim": "720x960",
-    "kb": "119.2"
-  },
-  {
-    "name": "performer-hat",
-    "dim": "800x1199",
-    "kb": "39.0"
+    "w": 800,
+    "h": 1067,
+    "kb": 129
   },
   {
     "name": "red-blue-duo",
-    "dim": "800x1067",
-    "kb": "78.2"
+    "w": 800,
+    "h": 1067,
+    "kb": 78.2
   },
   {
-    "name": "pink-braid",
-    "dim": "800x1200",
-    "kb": "51.9"
-  },
-  {
-    "name": "navy-elegant",
-    "dim": "800x1200",
-    "kb": "51.2"
+    "name": "alley-duo",
+    "w": 800,
+    "h": 1200,
+    "kb": 45.1
   },
   {
     "name": "navy-floral",
-    "dim": "800x1200",
-    "kb": "61.2"
+    "w": 800,
+    "h": 1200,
+    "kb": 61.2
   },
   {
-    "name": "pink-back",
-    "dim": "800x1200",
-    "kb": "41.4"
+    "name": "blossom-stand",
+    "w": 800,
+    "h": 1200,
+    "kb": 155.1
   },
   {
     "name": "spring-blossom",
-    "dim": "720x960",
-    "kb": "107.8"
+    "w": 800,
+    "h": 1067,
+    "kb": 120.2
+  },
+  {
+    "name": "stone-walk",
+    "w": 800,
+    "h": 1200,
+    "kb": 40.4
   },
   {
     "name": "red-palace",
-    "dim": "800x1067",
-    "kb": "75.6"
+    "w": 800,
+    "h": 1067,
+    "kb": 75.6
   },
   {
-    "name": "smile-blossom",
-    "dim": "800x1200",
-    "kb": "54.3"
+    "name": "red-wall",
+    "w": 800,
+    "h": 1067,
+    "kb": 85.1
   },
   {
-    "name": "fan-dance",
-    "dim": "800x560",
-    "kb": "28.0"
+    "name": "forest-path",
+    "w": 800,
+    "h": 1067,
+    "kb": 139.5
+  },
+  {
+    "name": "corridor-pair",
+    "w": 800,
+    "h": 1200,
+    "kb": 55.3
   }
 ]
