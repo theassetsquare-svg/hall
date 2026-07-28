@@ -1,6 +1,6 @@
 /* 일산명월관요정 — Service Worker v1.0 (2026-05-21)
    캐시 전략: HTML stale-while-revalidate, 정적자원 cache-first */
-const CACHE_VERSION = 'mwk-v1-20260521';
+const CACHE_VERSION = 'mwk-v2-20260728';
 const CORE = [
   '/',
   '/style.css',
