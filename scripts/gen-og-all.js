@@ -69,7 +69,7 @@ const pages = [
   },
   {
     file: 'contact/og-image.png',
-    footerText: '예약 문의 010-3695-4929',
+    footerText: '예약 문의 010-4117-5556',
     bg1: '#0A1A0A', bg2: '#060F06', bg3: '#030803',
     headerBand: '#0A1A0A',
     jeogori: '#1A4A1A', skirt: '#2D7A2D', skirtDark: '#1E5A1E',
@@ -220,8 +220,8 @@ function buildHanbok(p) {
 async function generateOG(page) {
   // Title: "일산명월관" — gold gradient, 170px, centered at y=800
   const titlePath = textToPath(fontBold, '일산명월관', 170, 600, 800, 'url(#titleGold)');
-  // Nick: "신실장" — white, 130px, centered at y=968
-  const nickPath  = textToPath(fontBold, '신실장', 130, 600, 968, '#FFFFFF');
+  // Nick: "일산룸 총책임자" — white, 130px, centered at y=968
+  const nickPath  = textToPath(fontBold, '일산룸 총책임자', 130, 600, 968, '#FFFFFF');
   // Footer text — small gold
   const footerPath = textToPath(fontBold, page.footerText, 26, 600, 1164, '#C9A96E');
   // Header label — small gold
@@ -274,7 +274,7 @@ ${hankokSvg}
 
 <!-- "일산명월관" — gold gradient, very large -->
 ${titlePath}
-<!-- "신실장" — white, very large -->
+<!-- "일산룸 총책임자" — white, very large -->
 ${nickPath}
 
 <!-- Header band -->

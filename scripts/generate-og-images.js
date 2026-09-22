@@ -34,8 +34,8 @@ function textToPath(font, text, fontSize, cx, cy, fill) {
 }
 
 async function generateOG(page) {
-  /* 신실장 — 가장 크게 (160px) */
-  const nickPath = textToPath(fontBold, '신실장', 160, 600, 420, '#FFFFFF');
+  /* 일산룸 총책임자 — 가장 크게 (160px) */
+  const nickPath = textToPath(fontBold, '일산룸 총책임자', 160, 600, 420, '#FFFFFF');
 
   /* 일산명월관요정 — 상단 (42px) */
   const titlePath = textToPath(fontBold, page.title, 42, 600, 200, '#C9A96E');
@@ -44,7 +44,7 @@ async function generateOG(page) {
   const subPath = textToPath(fontReg, page.sub, 28, 600, 680, '#E8D5B7');
 
   /* 전화번호 (24px) */
-  const telPath = textToPath(fontReg, '010-3695-4929', 24, 600, 780, 'rgba(232,213,183,0.7)');
+  const telPath = textToPath(fontReg, '010-4117-5556', 24, 600, 780, 'rgba(232,213,183,0.7)');
 
   /* 밤의 달 아이콘 */
   const moonSvg = `
@@ -103,7 +103,7 @@ async function generateOG(page) {
 }
 
 async function main() {
-  console.log('Generating 1:1 OG images — 신실장 BIG...');
+  console.log('Generating 1:1 OG images — 일산룸 총책임자 BIG...');
   for (const page of pages) {
     await generateOG(page);
   }
