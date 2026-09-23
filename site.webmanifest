@@ -27,10 +27,10 @@
   ],
   "shortcuts": [
     {
-      "name": "신실장에게 전화",
+      "name": "일산룸 총책임자에게 전화",
       "short_name": "전화",
-      "description": "010-3695-4929 신실장 직통 전화",
-      "url": "tel:010-3695-4929",
+      "description": "010-4117-5556 일산룸 총책임자 직통 전화",
+      "url": "tel:010-4117-5556",
       "icons": [{ "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }]
     },
     {
